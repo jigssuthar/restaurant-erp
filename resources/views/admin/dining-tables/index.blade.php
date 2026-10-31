@@ -14,7 +14,7 @@
     <div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
 @endif
 <div class="admin-table-card">
-    <form method="GET" class="row g-3 mb-4">
+    <form method="GET" action="{{ route('admin.dining-tables.index') }}" class="row g-3 mb-4" data-ajax-filter>
         <div class="col-lg-4 col-md-6"><input type="search" name="search" class="form-control" placeholder="Search table or branch" value="{{ request('search') }}"></div>
         <div class="col-lg-4 col-md-6"><select name="branch_id" class="form-select">
             <option value="">All branches</option>
@@ -48,7 +48,7 @@
                         <li><a class="dropdown-item" href="{{ route('admin.dining-tables.show', $table) }}">View</a></li>
                         <li><a class="dropdown-item" href="{{ route('admin.dining-tables.edit', $table) }}">Edit</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><form action="{{ route('admin.dining-tables.destroy', $table) }}" method="POST" onsubmit="return confirm('Delete this table?')">
+                        <li><form action="{{ route('admin.dining-tables.destroy', $table) }}" method="POST" data-ajax-form onsubmit="return confirm('Delete this table?')">
                             @csrf @method('DELETE')<button class="dropdown-item text-danger" type="submit">Delete</button></form></li>
                     </ul>
                 </div></td>

@@ -11,6 +11,14 @@
     <div class="text-muted small">{{ now()->format('d M Y') }}</div>
 </div>
 
+<div class="admin-card">
+    <form class="row g-3 align-items-end" method="GET" action="{{ route('admin.dashboard') }}" data-ajax-filter>
+        <div class="col-md-4"><label class="form-label">From date</label><input class="form-control" type="date" name="from" value="{{ $filters['from'] ?? '' }}"></div>
+        <div class="col-md-4"><label class="form-label">To date</label><input class="form-control" type="date" name="to" value="{{ $filters['to'] ?? '' }}"></div>
+        <div class="col-md-4 d-flex gap-2"><button class="btn btn-orange">Update dashboard</button><a href="{{ route('admin.dashboard') }}" class="btn btn-light border">Reset</a></div>
+    </form>
+</div>
+
 <div class="row g-4 mb-4">
     @foreach($stats as [$label, $value, $icon, $color, $route])
         <div class="col-xl-4 col-md-6">
@@ -37,7 +45,7 @@
     <div class="col-lg-4">
         <div class="admin-card h-100">
             <h5 class="fw-bold mb-4">Order summary</h5>
-            @foreach(['pending', 'preparing', 'ready', 'completed', 'cancelled'] as $status)
+            @foreach(['pending', 'held', 'preparing', 'ready', 'completed', 'cancelled'] as $status)
                 <div class="d-flex justify-content-between mb-3">
                     <span>{{ ucfirst($status) }}</span>
                     <span class="badge bg-light text-dark">{{ $orderStatuses->get($status, 0) }}</span>

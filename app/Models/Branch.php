@@ -50,4 +50,29 @@ class Branch extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    public function serviceRequests(): HasMany
+    {
+        return $this->hasMany(TableServiceRequest::class);
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(RestaurantEvent::class);
+    }
+
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    public function inventoryItems(): HasMany
+    {
+        return $this->hasMany(InventoryItem::class);
+    }
+
+    public function purchaseOrders(): HasMany
+    {
+        return $this->hasMany(PurchaseOrder::class);
+    }
 }

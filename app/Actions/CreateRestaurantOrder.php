@@ -3,8 +3,10 @@
 namespace App\Actions;
 
 use App\Models\Branch;
+use App\Models\CashRegisterSession;
 use App\Models\DiningTable;
 use App\Models\Order;
+use App\Models\OrderPayment;
 use App\Models\OrganizationSetting;
 use App\Models\Product;
 use App\Models\User;
@@ -66,12 +68,20 @@ class CreateRestaurantOrder
                 ];
             }
 
+            $discountType = $details['discount_type'] ?? null;
+            $discountValue = (float) ($details['discount_value'] ?? 0);
+            $discountAmount = match ($discountType) {
+                'percentage' => round($subtotal * min($discountValue, 100) / 100, 2),
+                'fixed' => min(round($discountValue, 2), $subtotal),
+                default => 0,
+            };
+            $taxableSubtotal = max(0, round($subtotal - $discountAmount, 2));
             $taxRate = (float) $settings->tax_rate;
             $serviceChargeRate = (float) $settings->service_charge_rate;
-            $taxAmount = round($subtotal * $taxRate / 100, 2);
-            $serviceCharge = round($subtotal * $serviceChargeRate / 100, 2);
+            $taxAmount = round($taxableSubtotal * $taxRate / 100, 2);
+            $serviceCharge = round($taxableSubtotal * $serviceChargeRate / 100, 2);
             $deliveryFee = $orderType === 'delivery' ? (float) $settings->delivery_fee : 0;
-            $total = round($subtotal + $taxAmount + $serviceCharge + $deliveryFee, 2);
+            $total = round($taxableSubtotal + $taxAmount + $serviceCharge + $deliveryFee, 2);
             $paymentStatus = $details['payment_status'] ?? 'pending';
 
             $order = Order::create([
@@ -80,7 +90,7 @@ class CreateRestaurantOrder
                 'user_id' => $user?->id,
                 'order_number' => 'ORD-'.now()->format('Ymd').'-'.Str::upper(Str::random(6)),
                 'order_type' => $orderType,
-                'status' => 'pending',
+                'status' => ($details['hold_order'] ?? false) ? 'held' : 'pending',
                 'payment_status' => $paymentStatus,
                 'payment_method' => $paymentStatus === 'paid' ? ($details['payment_method'] ?? null) : null,
                 'currency_code' => $settings->currency_code ?: 'INR',
@@ -97,9 +107,36 @@ class CreateRestaurantOrder
                 'paid_at' => $paymentStatus === 'paid' ? now() : null,
                 'subtotal' => $subtotal,
                 'total' => $total,
+                'discount_type' => $discountAmount > 0 ? $discountType : null,
+                'discount_value' => $discountAmount > 0 ? $discountValue : 0,
+                'discount_amount' => $discountAmount,
             ]);
 
             $order->items()->createMany($lineItems);
+            if ($paymentStatus === 'paid' && $total > 0) {
+                $registerSession = $details['payment_method'] === 'cash'
+                    ? CashRegisterSession::query()
+                        ->where('branch_id', $branch->id)
+                        ->where('opened_by', $user?->id)
+                        ->whereNull('closed_at')
+                        ->lockForUpdate()
+                        ->latest('opened_at')
+                        ->first()
+                    : null;
+                OrderPayment::create([
+                    'order_id' => $order->id,
+                    'cash_register_session_id' => $registerSession?->id,
+                    'created_by' => $user?->id,
+                    'transaction_type' => 'payment',
+                    'payment_method' => $details['payment_method'],
+                    'amount' => $total,
+                    'recorded_at' => now(),
+                ]);
+                $order->update(['invoice_number' => sprintf('INV-%05d-%08d', $branch->id, $order->id)]);
+            }
+            if ($paymentStatus === 'paid' && $total <= 0) {
+                $order->update(['invoice_number' => sprintf('INV-%05d-%08d', $branch->id, $order->id)]);
+            }
             $table?->update(['status' => 'occupied']);
 
             return $order;

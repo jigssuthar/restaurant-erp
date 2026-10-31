@@ -21,6 +21,26 @@
     </div>
 </section>
 
+<section class="section-space pricing-context">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <img class="pricing-context-image" src="{{ asset('images/menu-food.jpg') }}" alt="Restaurant dishes ready for guests" loading="lazy">
+            </div>
+            <div class="col-lg-6">
+                <span class="eyebrow">PLANS FOR YOUR OPERATION</span>
+                <h2 class="section-heading mt-3">Choose a plan around the way you serve.</h2>
+                <p class="section-description mt-3">Compare the published plan details and included limits for your restaurant. Branch, staff, product, and table limits depend on the plan configured by the platform operator.</p>
+                <div class="pricing-context-points">
+                    <div><i class="bi bi-check-circle-fill"></i><span>Review the billing interval and listed features before subscribing.</span></div>
+                    <div><i class="bi bi-check-circle-fill"></i><span>Trial length is shown at signup and may vary by platform settings.</span></div>
+                    <div><i class="bi bi-check-circle-fill"></i><span>RestaurantOS subscription billing is separate from customer food-order payments.</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="section-space">
 
     <div class="container">

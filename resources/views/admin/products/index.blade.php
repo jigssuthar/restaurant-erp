@@ -12,7 +12,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
 @endif
 <div class="admin-table-card">
-    <form method="GET" class="row g-3 mb-4">
+    <form method="GET" action="{{ route('admin.products.index') }}" class="row g-3 mb-4" data-ajax-filter>
         <div class="col-lg-5 col-md-6"><input type="search" name="search" class="form-control"
             placeholder="Search product or SKU" value="{{ request('search') }}"></div>
         <div class="col-lg-3 col-md-6"><select name="branch_id" class="form-select">
@@ -59,7 +59,7 @@
                         <li><a class="dropdown-item" href="{{ route('admin.products.show', $product) }}">View</a></li>
                         <li><a class="dropdown-item" href="{{ route('admin.products.edit', $product) }}">Edit</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><form action="{{ route('admin.products.destroy', $product) }}" method="POST" onsubmit="return confirm('Delete this product?')">
+                        <li><form action="{{ route('admin.products.destroy', $product) }}" method="POST" data-ajax-form onsubmit="return confirm('Delete this product?')">
                             @csrf @method('DELETE')
                             <button type="submit" class="dropdown-item text-danger">Delete</button>
                         </form></li>

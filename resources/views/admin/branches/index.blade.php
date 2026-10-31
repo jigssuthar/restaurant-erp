@@ -27,7 +27,7 @@
 @endif
 
 <div class="admin-table-card">
-    <form method="GET" class="row g-3 mb-4">
+    <form method="GET" action="{{ route('admin.branches.index') }}" class="row g-3 mb-4" data-ajax-filter>
         <div class="col-lg-4 col-md-6">
             <input type="search" name="search" class="form-control"
                    placeholder="Search branch, code, city, or organization"
@@ -104,7 +104,7 @@
                                     </a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
-                                        <form action="{{ route('admin.branches.destroy', $branch) }}" method="POST"
+                                        <form action="{{ route('admin.branches.destroy', $branch) }}" method="POST" data-ajax-form
                                               onsubmit="return confirm('Delete this branch?')">
                                             @csrf
                                             @method('DELETE')

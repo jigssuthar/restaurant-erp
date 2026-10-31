@@ -68,9 +68,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const roleSelect = document.getElementById('role');
     const updateAssignments = () => {
         if (organizationSelect) {
-            organizationSelect.required = ['manager', 'staff'].includes(roleSelect.value);
+            organizationSelect.required = ['manager', 'staff', 'waiter', 'captain', 'chef', 'kitchen_manager'].includes(roleSelect.value);
         }
-        branchSelect.required = roleSelect.value === 'staff';
+        branchSelect.required = ['staff', 'waiter', 'captain', 'chef', 'kitchen_manager'].includes(roleSelect.value);
     };
     const updateBranches = () => {
         if (!organizationSelect) return;

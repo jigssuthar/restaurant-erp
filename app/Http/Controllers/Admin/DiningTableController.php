@@ -95,9 +95,18 @@ class DiningTableController extends Controller
         $this->ensureBranchAccess($diningTable->branch);
         $data = $this->validatedData($request, $diningTable);
 
-        if ($data['status'] === 'available'
-            && $diningTable->orders()->whereIn('status', ['pending', 'preparing', 'ready'])->exists()) {
-            return back()->withErrors(['status' => 'A table with an active order cannot be marked available.']);
+        $hasUnsettledOrders = $diningTable->orders()
+            ->where(function ($query) {
+                $query->whereIn('status', ['pending', 'held', 'preparing', 'ready'])
+                    ->orWhere(function ($query) {
+                        $query->where('status', 'completed')
+                            ->whereNotIn('payment_status', ['paid', 'partially_refunded']);
+                    });
+            })
+            ->exists();
+
+        if ($data['status'] === 'available' && $hasUnsettledOrders) {
+            return back()->withErrors(['status' => 'A table with active orders or an outstanding bill cannot be marked available.']);
         }
 
         $diningTable->update($data);

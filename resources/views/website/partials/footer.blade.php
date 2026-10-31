@@ -31,7 +31,7 @@
                 <h2 class="text-white fw-bold mb-3">Products</h2>
                 <div class="footer-links">
                     <a href="{{ route('products.pos') }}">POS Software</a><br>
-                    <a href="{{ route('products.inventory') }}">Menu Management</a><br>
+                    <a href="{{ route('products.inventory') }}">Inventory & Stock</a><br>
                     <a href="{{ route('products.multi-branch') }}">Multi-Branch</a>
                 </div>
             </div>

@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\CreateRestaurantOrder;
+use App\Actions\ReleaseDiningTableWhenSettled;
+use App\Actions\TransitionRestaurantOrder;
 use App\Http\Controllers\Admin\Concerns\ScopesBranchData;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
+use App\Models\CashRegisterSession;
 use App\Models\DiningTable;
 use App\Models\Order;
+use App\Models\OrderPayment;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -92,9 +96,13 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $this->ensureBranchAccess($order->branch);
-        $order->load(['branch.organization.settings', 'diningTable', 'user', 'items']);
+        $order->load(['branch.organization.settings', 'diningTable', 'user', 'items', 'payments.creator']);
+        $paidAmount = (float) $order->payments->where('transaction_type', 'payment')->sum('amount');
+        $refundedAmount = (float) $order->payments->where('transaction_type', 'refund')->sum('amount');
+        $remainingBalance = max(0, round((float) $order->total - $paidAmount, 2));
+        $refundableAmount = max(0, round($paidAmount - $refundedAmount, 2));
 
-        return view('admin.orders.show', compact('order'));
+        return view('admin.orders.show', compact('order', 'paidAmount', 'refundedAmount', 'remainingBalance', 'refundableAmount'));
     }
 
     public function updateStatus(Request $request, Order $order)
@@ -103,43 +111,22 @@ class OrderController extends Controller
         $data = $request->validate([
             'status' => ['required', Rule::in(Order::STATUSES)],
         ]);
+        if ($data['status'] === 'cancelled' && $order->payments()->where('transaction_type', 'payment')->exists()) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Paid orders cannot be cancelled without a refund workflow.',
+                    'errors' => ['status' => ['Paid orders cannot be cancelled without a refund workflow.']],
+                ], 422);
+            }
 
-        $allowedTransitions = [
-            'pending' => ['preparing', 'cancelled'],
-            'preparing' => ['ready', 'cancelled'],
-            'ready' => ['completed', 'cancelled'],
-            'completed' => [],
-            'cancelled' => [],
-        ];
-
-        if (! \in_array($data['status'], $allowedTransitions[$order->status] ?? [], true)) {
-            return back()->withErrors(['status' => 'That order status transition is not allowed.']);
-        }
-
-        if ($data['status'] === 'completed' && $order->payment_status !== 'paid') {
-            return back()->withErrors(['status' => 'Record payment before completing the order.']);
-        }
-
-        if ($data['status'] === 'cancelled' && $order->payment_status === 'paid') {
             return back()->withErrors(['status' => 'Paid orders cannot be cancelled without a refund workflow.']);
         }
 
-        DB::transaction(function () use ($data, $order) {
-            $order->update(['status' => $data['status']]);
+        app(TransitionRestaurantOrder::class)->handle($order, $data['status']);
 
-            if (\in_array($data['status'], ['completed', 'cancelled'], true)
-                && $order->dining_table_id) {
-                $hasOtherActiveOrders = Order::where('dining_table_id', $order->dining_table_id)
-                    ->whereIn('status', ['pending', 'preparing', 'ready'])
-                    ->exists();
-
-                if (! $hasOtherActiveOrders) {
-                    DiningTable::whereKey($order->dining_table_id)
-                        ->where('status', 'occupied')
-                        ->update(['status' => 'available']);
-                }
-            }
-        });
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Order status updated.', 'refresh' => true]);
+        }
 
         return back()->with('success', 'Order status updated successfully.');
     }
@@ -151,22 +138,180 @@ class OrderController extends Controller
             'payment_method' => ['required', Rule::in(Order::PAYMENT_METHODS)],
         ]);
 
-        if ($order->payment_status === 'paid' || $order->status === 'cancelled') {
-            return back()->withErrors(['payment_method' => 'Payment cannot be recorded for this order.']);
-        }
+        $remaining = $this->remainingBalance($order);
+        abort_if($remaining <= 0, 422, 'This order has no outstanding balance.');
 
-        $order->update([
-            'payment_status' => 'paid',
+        $this->storePaymentTransactions($request, $order, [[
             'payment_method' => $data['payment_method'],
-            'paid_at' => now(),
-        ]);
+            'amount' => $remaining,
+        ]]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Payment recorded.', 'refresh' => true]);
+        }
 
         return back()->with('success', 'Payment recorded successfully.');
     }
 
+    public function recordPayments(Request $request, Order $order)
+    {
+        $this->ensureBranchAccess($order->branch);
+        $data = $request->validate([
+            'payments' => ['required', 'array', 'min:1', 'max:5'],
+            'payments.*.payment_method' => ['required', Rule::in(Order::PAYMENT_METHODS)],
+            'payments.*.amount' => ['required', 'numeric', 'gt:0', 'decimal:0,2', 'max:100000000'],
+            'payments.*.reference' => ['nullable', 'string', 'max:120'],
+        ]);
+        $this->storePaymentTransactions($request, $order, $data['payments']);
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Payment recorded.', 'refresh' => true]);
+        }
+
+        return back()->with('success', 'Payment recorded successfully.');
+    }
+
+    public function refund(Request $request, Order $order)
+    {
+        $this->ensureBranchAccess($order->branch);
+        $data = $request->validate([
+            'payment_method' => ['required', Rule::in(Order::PAYMENT_METHODS)],
+            'amount' => ['required', 'numeric', 'gt:0', 'decimal:0,2', 'max:100000000'],
+            'reference' => ['nullable', 'string', 'max:120'],
+            'notes' => ['required', 'string', 'max:500'],
+        ]);
+
+        DB::transaction(function () use ($request, $order, $data) {
+            $lockedOrder = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
+            $received = (float) $lockedOrder->payments()->where('transaction_type', 'payment')->sum('amount');
+            $refunded = (float) $lockedOrder->payments()->where('transaction_type', 'refund')->sum('amount');
+            $available = round($received - $refunded, 2);
+            $amount = round((float) $data['amount'], 2);
+
+            if ($amount > $available) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'amount' => 'Refund cannot exceed the remaining amount paid.',
+                ]);
+            }
+
+            OrderPayment::create([
+                'order_id' => $lockedOrder->id,
+                'cash_register_session_id' => $data['payment_method'] === 'cash'
+                    ? CashRegisterSession::query()
+                        ->where('branch_id', $lockedOrder->branch_id)
+                        ->where('opened_by', $request->user()->id)
+                        ->whereNull('closed_at')
+                        ->lockForUpdate()
+                        ->latest('opened_at')
+                        ->value('id')
+                    : null,
+                'created_by' => $request->user()->id,
+                'transaction_type' => 'refund',
+                'payment_method' => $data['payment_method'],
+                'amount' => $amount,
+                'reference' => $data['reference'] ?? null,
+                'notes' => $data['notes'],
+                'recorded_at' => now(),
+            ]);
+            $this->syncPaymentSummary($lockedOrder);
+        });
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Refund recorded.', 'refresh' => true]);
+        }
+
+        return back()->with('success', 'Refund recorded successfully.');
+    }
+
+    private function storePaymentTransactions(Request $request, Order $order, array $payments): void
+    {
+        DB::transaction(function () use ($request, $order, $payments) {
+            $lockedOrder = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
+            if ($lockedOrder->status === 'cancelled') {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'payments' => 'Cancelled orders cannot receive payments.',
+                ]);
+            }
+            $remaining = $this->remainingBalance($lockedOrder);
+            $amount = round(collect($payments)->sum(fn ($payment) => (float) $payment['amount']), 2);
+            if ($amount > $remaining) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'payments' => 'Payment exceeds the outstanding order balance.',
+                ]);
+            }
+
+            foreach ($payments as $payment) {
+                $registerSession = $payment['payment_method'] === 'cash'
+                    ? CashRegisterSession::query()
+                        ->where('branch_id', $lockedOrder->branch_id)
+                        ->where('opened_by', $request->user()->id)
+                        ->whereNull('closed_at')
+                        ->lockForUpdate()
+                        ->latest('opened_at')
+                        ->first()
+                    : null;
+                OrderPayment::create([
+                    'order_id' => $lockedOrder->id,
+                    'cash_register_session_id' => $registerSession?->id,
+                    'created_by' => $request->user()->id,
+                    'transaction_type' => 'payment',
+                    'payment_method' => $payment['payment_method'],
+                    'amount' => round((float) $payment['amount'], 2),
+                    'reference' => $payment['reference'] ?? null,
+                    'recorded_at' => now(),
+                ]);
+            }
+
+            $this->syncPaymentSummary($lockedOrder);
+        });
+
+        if ($order->fresh()->status === 'completed') {
+            app(ReleaseDiningTableWhenSettled::class)->handle($order);
+        }
+    }
+
+    private function syncPaymentSummary(Order $order): void
+    {
+        $received = (float) $order->payments()->where('transaction_type', 'payment')->sum('amount');
+        $refunded = (float) $order->payments()->where('transaction_type', 'refund')->sum('amount');
+        $netPaid = round($received - $refunded, 2);
+        $refundStatus = $refunded > 0;
+        $paymentStatus = match (true) {
+            $refundStatus && $netPaid <= 0 => 'refunded',
+            $refundStatus => 'partially_refunded',
+            $netPaid <= 0 => 'pending',
+            $netPaid < (float) $order->total => 'partial',
+            default => 'paid',
+        };
+        $methods = $order->payments()
+            ->where('transaction_type', 'payment')
+            ->distinct()
+            ->pluck('payment_method')
+            ->values();
+
+        $order->update([
+            'payment_status' => $paymentStatus,
+            'payment_method' => $methods->count() === 1 ? $methods->first() : ($methods->isNotEmpty() ? 'multiple' : null),
+            'paid_at' => $received >= (float) $order->total || $order->payment_status === 'paid'
+                ? ($order->paid_at ?? now())
+                : null,
+            'invoice_number' => $order->invoice_number ?: sprintf('INV-%05d-%08d', $order->branch_id, $order->id),
+        ]);
+    }
+
+    private function remainingBalance(Order $order): float
+    {
+        $received = (float) $order->payments()->where('transaction_type', 'payment')->sum('amount');
+        if ($order->payment_status === 'paid' && $received === 0.0) {
+            return 0;
+        }
+
+        return max(0, round((float) $order->total - $received, 2));
+    }
+
     private function validatedData(Request $request): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'branch_id' => ['required', 'integer', 'exists:branches,id'],
             'order_type' => ['required', Rule::in(Order::TYPES)],
             'dining_table_id' => [
@@ -198,6 +343,22 @@ class OrderController extends Controller
                 Rule::in(Order::PAYMENT_METHODS),
             ],
             'notes' => ['nullable', 'string', 'max:2000'],
+            'discount_type' => ['nullable', 'required_with:discount_value', Rule::in(['fixed', 'percentage'])],
+            'discount_value' => ['nullable', 'required_with:discount_type', 'numeric', 'min:0', 'max:100000000'],
+            'hold_order' => ['sometimes', 'boolean'],
         ]);
+        if (($data['discount_type'] ?? null) === 'percentage' && (float) ($data['discount_value'] ?? 0) > 100) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'discount_value' => 'Percentage discount cannot exceed 100%.',
+            ]);
+        }
+        if ($request->boolean('hold_order') && $data['payment_status'] === 'paid') {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'hold_order' => 'A held order cannot be marked paid during creation.',
+            ]);
+        }
+        $data['hold_order'] = $request->boolean('hold_order');
+
+        return $data;
     }
 }

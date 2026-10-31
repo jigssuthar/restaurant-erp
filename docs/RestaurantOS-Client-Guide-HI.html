@@ -203,7 +203,8 @@
         @page { size: A4; margin: 0; }
         @media print {
             html, body { width: 210mm; margin: 0; background: #fff; }
-            .page { width: 210mm; min-height: 297mm; margin: 0; padding: 15mm 18mm 16mm; box-shadow: none; }
+            body { font-size: 9.5pt; line-height: 1.4; }
+            .page { width: 210mm; min-height: 297mm; margin: 0; padding: 13mm 18mm 13mm; box-shadow: none; }
             .cover { min-height: 235mm; }
         }
     </style>
@@ -243,18 +244,19 @@
     <p class="lead">RestaurantOS ek web-based restaurant management platform hai. Restaurant owner apna online workspace banata hai; team usmein branches, menu, tables aur customer orders manage karti hai.</p>
     <div class="grid-2 space-top">
         <div class="card"><h3>Website & account</h3><p>Public website, contact form, account registration, login aur password reset ke entry points.</p></div>
-        <div class="card"><h3>Restaurant workspace</h3><p>Dashboard, branches, categories, products, dining tables, QR links, orders, staff aur settings.</p></div>
-        <div class="card"><h3>Guest QR experience</h3><p>Customer table ka QR scan karke menu dekhta, items select karta aur order summary receive karta hai.</p></div>
+        <div class="card"><h3>Restaurant workspace</h3><p>Dashboard, branches, menu, tables, QR orders, Kitchen Display, waiter Service App, calendar/events, reservations, inventory, purchasing, reports aur staff.</p></div>
+        <div class="card"><h3>Guest QR experience</h3><p>Customer photo menu browse/search karta, cart review karta, order confirmation dekhta aur table se service request bhej sakta hai.</p></div>
         <div class="card"><h3>SaaS administration</h3><p>Platform operator multiple restaurant accounts, configurable subscription plans aur billing status manage kar sakta hai.</p></div>
     </div>
     <h2>Typical customer journey</h2>
     <div class="flow"><span>Restaurant signup</span><b>→</b><span>Workspace setup</span><b>→</b><span>Menu & tables</span><b>→</b><span>QR print</span><b>→</b><span>Guest order</span><b>→</b><span>Team processes order</span></div>
-    <div class="callout blue"><strong>System ka purpose:</strong> restaurant ke basic dine-in operations ko ek jagah lana. Yeh guide available workflow samjhata hai; yeh accounting, inventory ya food-delivery marketplace ka claim nahi karta.</div>
+    <div class="callout blue"><strong>System ka purpose:</strong> restaurant operations ko ek jagah lana. Is release mein event planning, reservations, manual stock tracking, purchasing aur operational reports bhi shamil hain; yeh full accounting ya food-delivery marketplace ka claim nahi karta.</div>
     <h2>Is guide mein</h2>
     <ul class="toc">
         <li>Workspace roles aur tenant data separation</li>
         <li>Restaurant setup: branch, menu, table, QR</li>
         <li>Staff orders, status flow, payment record aur settings</li>
+        <li>Calendar/events, reservations, inventory, suppliers/purchasing aur reports</li>
         <li>Customer QR ordering ka end-to-end experience</li>
         <li>Trial, plans, limits aur Razorpay subscription billing</li>
         <li>Current scope, exclusions, demo checklist aur FAQs</li>
@@ -274,6 +276,8 @@
             <tr><td><strong>Restaurant Owner / Admin</strong></td><td>Restaurant workspace ka owner</td><td>Apne restaurant ka dashboard, branches, menu, tables, orders, settings, staff aur billing.</td></tr>
             <tr><td><strong>Manager</strong></td><td>Restaurant operations lead</td><td>Apne organization ke branches aur day-to-day operations; platform-wide data nahi.</td></tr>
             <tr><td><strong>Staff</strong></td><td>Outlet team member</td><td>Assigned branch ke orders aur permitted read-only screens.</td></tr>
+            <tr><td><strong>Waiter / Captain</strong></td><td>Dining-room team</td><td>Assigned branch ka Service App: table requests acknowledge/complete karna, order serve mark karna aur payment record karna.</td></tr>
+            <tr><td><strong>Chef / Kitchen Manager</strong></td><td>Kitchen team</td><td>Assigned branch ka Kitchen Display: new tickets lena, preparation start karna aur ready mark karna.</td></tr>
             <tr><td><strong>Guest</strong></td><td>Restaurant customer</td><td>Login ke bina table QR menu dekhe aur dine-in order submit kare.</td></tr>
         </tbody>
     </table>
@@ -297,7 +301,7 @@
     <div class="step"><span class="num">4</span><div><h3>Products add karein</h3><p>Product name, category, price, cost price, type, optional SKU, description, photo aur availability set karein.</p></div></div>
     <div class="step"><span class="num">5</span><div><h3>Dining tables banayein</h3><p>Branch select karein, table number/capacity add karein aur status (available, occupied, reserved, maintenance) maintain karein.</p></div></div>
     <div class="step"><span class="num">6</span><div><h3>Tax, currency aur fees set karein</h3><p>Organization Settings mein currency, tax label/rate, service charge, delivery fee aur receipt header/footer configure karein.</p></div></div>
-    <div class="step"><span class="num">7</span><div><h3>Staff invite/create karke test karein</h3><p>Har employee ka role aur branch assignment set karein. Owner/manager se test order bana kar workflow check karein.</p></div></div>
+    <div class="step"><span class="num">7</span><div><h3>Staff invite/create karke test karein</h3><p>Har employee ka role aur branch assignment set karein. Waiter/captain ke liye Service App aur chef/kitchen manager ke liye Kitchen Display login test karein.</p></div></div>
     <div class="callout blue"><strong>Live tip:</strong> Browser se image upload karte waqt JPG, PNG ya WEBP image 2 MB se chhoti honi chahiye. Har branch par menu aur tax setup ko alag se verify karein.</div>
     <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>04</span></div>
 </section>
@@ -322,6 +326,7 @@
         <li>Restaurant mein sahi physical table par QR card lagayein.</li>
     </ol>
     <div class="callout"><strong>QR replace karna:</strong> QR rotate karne se purana link invalid ho jata hai. Naya code print karke hi table par lagayein; stale QR se guest order nahi kar payega.</div>
+    <div class="callout blue"><strong>Operations workspace:</strong> Calendar mein events/maintenance schedule karein; reservations mein guest aur table time manage karein; inventory mein stock movement record karein; suppliers aur purchase orders se received quantity stock mein add karein; Reports mein date/branch ke mutabik performance dekhein.</div>
     <p class="small muted">Menu mein inactive categories/unavailable products nahi dikhte. Isse sold-out item ko customer se temporarily hide kiya ja sakta hai.</p>
     <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>05</span></div>
 </section>
@@ -331,8 +336,8 @@
     <span class="eyebrow">From order to completion</span>
     <h2>Order management workflow</h2>
     <p>Staff dashboard se order create kar sakte hain, ya customer table QR se. Har order ke saath branch, item names, quantities aur order-time price record hota hai.</p>
-    <div class="flow"><span>Pending</span><b>→</b><span>Preparing</span><b>→</b><span>Ready</span><b>→</b><span>Completed</span></div>
-    <p>Order ko permitted workflow ke mutabik cancel kiya ja sakta hai. Completed/cancelled orders final states hain. Paid order cancel karne ke liye refund workflow is version mein available nahi hai.</p>
+    <div class="flow"><span>Pending</span><b>→</b><span>Held / Resume</span><b>→</b><span>Preparing</span><b>→</b><span>Ready</span><b>→</b><span>Completed</span></div>
+    <p>Kitchen Display order ko preparing aur ready tak progress karta hai; waiter Service App se served mark karta hai. Fulfillment aur payment alag track hote hain: unpaid order serve ho sakta hai, lekin table payment settle hone tak occupied rehti hai. Completed/cancelled orders final states hain. Paid order ko status se cancel nahi kiya ja sakta; authorized staff order detail se refund ledger record kar sakte hain. Refund ko payment provider par alag se process/verify karna hoga.</p>
     <h2>Order types</h2>
     <div class="grid-3">
         <div class="card"><h3>Dine-in</h3><p>Dining table se linked. Staff ya table QR se create ho sakta hai.</p></div>
@@ -343,44 +348,60 @@
     <table>
         <thead><tr><th>Payment option</th><th>System behavior</th></tr></thead>
         <tbody>
-            <tr><td>Cash</td><td>Restaurant par payment milne ke baad staff payment status Paid karke Cash select karta hai.</td></tr>
-            <tr><td>Card</td><td>External card terminal par payment ke baad staff record karta hai. RestaurantOS card terminal ko charge nahi karta.</td></tr>
-            <tr><td>UPI</td><td>Restaurant ke UPI QR/app par payment ke baad staff UPI method select karke record karta hai.</td></tr>
+            <tr><td>Cash</td><td>Restaurant par payment milne ke baad staff Cash method se record karta hai; open cash register ho to tender us session se link hota hai.</td></tr>
+            <tr><td>Card / UPI / Other</td><td>External terminal, UPI app ya anya channel par payment verify karke staff selected method se record karta hai. RestaurantOS payment provider ko charge nahi karta.</td></tr>
             <tr><td>Pending</td><td>Payment baad mein lena hai to order pending rehta hai. QR dine-in order initially unpaid rehta hai.</td></tr>
         </tbody>
     </table>
+    <div class="callout"><strong>POS billing detail:</strong> Discount, split/partial payment, invoice, refund ledger aur cash-register day close ke steps agle page par diye gaye hain.</div>
     <div class="callout blue"><strong>Important distinction:</strong> Razorpay subscription checkout restaurant ke RestaurantOS plan ki payment ke liye hai. Yeh feature guest ke food order ka online payment process nahi karta.</div>
     <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>06</span></div>
 </section>
 
 <section class="page">
-    <div class="page-head"><span class="brand">RestaurantOS</span><span>06 · Guest QR ordering</span></div>
-    <span class="eyebrow">A smooth table-side experience</span>
-    <h2>Customer QR se order kaise deta hai?</h2>
-    <div class="step"><span class="num">1</span><div><h3>Table-specific QR scan</h3><p>Guest phone camera se apne table par laga QR scan karta hai. Login ya app install ki zaroorat nahi.</p></div></div>
-    <div class="step"><span class="num">2</span><div><h3>Available menu browse</h3><p>Usi branch ke active categories aur available products customer ko dikhte hain.</p></div></div>
-    <div class="step"><span class="num">3</span><div><h3>Items select karein</h3><p>Quantity select/change karne par cart, selected items aur estimated total screen par update hote hain.</p></div></div>
-    <div class="step"><span class="num">4</span><div><h3>Order place karein</h3><p>Optional name, phone ya notes ke saath order submit hota hai. Server availability aur current product prices verify karke total banata hai.</p></div></div>
-    <div class="step"><span class="num">5</span><div><h3>Order summary dekhein</h3><p>Confirmation par order number, table, date/time, items, quantity, line totals, subtotal, tax, service charge aur total dikhte hain.</p></div></div>
-    <div class="step"><span class="num">6</span><div><h3>Restaurant mein pay karein</h3><p>QR order unpaid hai; customer payment restaurant staff ko deta hai. Staff dashboard mein payment method record karta hai.</p></div></div>
-    <div class="callout green"><strong>Correct table routing:</strong> Har table ka unique QR token us table ko order se link karta hai. Active menu items aur status server par dobara check hote hain; customer browser se bheja hua price accept nahi hota.</div>
-    <h2>Guest ko kya chahiye?</h2>
-    <p>Internet access, camera/QR scanning aur modern mobile browser. Ordering experience responsive web page hai; alag mobile app install nahi karni hoti.</p>
-    <p class="small muted">Table reserved ya maintenance status mein ho to QR menu/order available nahi hota. Table occupied ho lekin active ho to additional QR order allowed hai.</p>
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>06 · POS billing</span></div>
+    <span class="eyebrow">Take payment with a clear audit trail</span>
+    <h2>POS billing controls</h2>
+    <p>Admin → Orders se staff bill create, hold, resume aur process kar sakta hai. Product prices server se aate hain; customer ya browser ke bheje hue amount par bharosa nahi kiya jata.</p>
+    <div class="grid-2">
+        <div class="card"><h3>Discount, partial & split payment</h3><p class="small">Staff fixed ya percentage discount laga sakta hai; tax aur service charge discounted amount par calculate hote hain. Order detail se partial payment ya multiple payment methods record karein. Outstanding amount se zyada payment accept nahi hoti.</p></div>
+        <div class="card"><h3>Invoice & payment history</h3><p class="small">Pehli payment par invoice number banta hai. Har tender method, amount, reference aur staff member ke saath ledger mein store hota hai; receipt print ki ja sakti hai.</p></div>
+        <div class="card"><h3>Refund record</h3><p class="small">Order detail se paid amount ki limit ke andar refund ledger entry banayein. Entry audit ke liye hai; actual cash/card/UPI refund ko provider par alag process aur verify karna hoga.</p></div>
+        <div class="card"><h3>Cash register & day close</h3><p class="small">Cash Register se opening float enter karein. Linked cash tenders/refunds se expected cash calculate hota hai; close par counted amount, difference aur notes record karein.</p></div>
+    </div>
+    <div class="callout blue"><strong>Staff sequence:</strong> Order create karein → zaroorat par hold/resume ya discount lagayein → payment method(s) record karein → invoice/ledger review karein → shift ke end par cash register reconcile karein.</div>
+    <div class="callout"><strong>Limitations:</strong> Coupon redemption, split/merge bills aur food-order payment gateway checkout is release mein nahi hain.</div>
     <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>07</span></div>
 </section>
 
 <section class="page">
-    <div class="page-head"><span class="brand">RestaurantOS</span><span>07 · Dashboard & settings</span></div>
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>07 · Guest QR ordering</span></div>
+    <span class="eyebrow">A smooth table-side experience</span>
+    <h2>Customer QR se order kaise deta hai?</h2>
+    <div class="step"><span class="num">1</span><div><h3>Table-specific QR scan</h3><p>Guest phone camera se apne table par laga QR scan karta hai. Login ya app install ki zaroorat nahi.</p></div></div>
+    <div class="step"><span class="num">2</span><div><h3>Photo menu browse karein</h3><p>Active categories, product photos aur available items dikhte hain. Search aur category filters se menu narrow kar sakte hain.</p></div></div>
+    <div class="step"><span class="num">3</span><div><h3>Cart review karein</h3><p>Item add karte hi selected state, quantity controls, subtotal, configured tax/service charge aur total update hote hain; mobile par sticky order button rehta hai.</p></div></div>
+    <div class="step"><span class="num">4</span><div><h3>Order place karein aur details dekhein</h3><p>Optional name/phone/notes ke saath order submit karein. Confirmation mein order number, table, timestamp, item quantities, line totals aur complete bill summary milti hai.</p></div></div>
+    <div class="grid-2 space-top">
+        <div class="card"><h3>Kitchen Display · /kitchen-display</h3><p class="small">Standalone kitchen screen par chef ko live ticket lanes mein new, preparing, ready aur served-today orders dikhte hain. Har ticket mein table, items, quantity aur customer notes hote hain; pending tickets preparing aur phir ready mark kiye jaate hain.</p></div>
+        <div class="card"><h3>Waiter Service App · /service-app</h3><p class="small">Standalone mobile-friendly app mein table cards active orders, guest requests, serving aur outstanding payment dikhate hain. Waiter request acknowledge/complete, order served mark aur Cash/Card/UPI/Other payment record kar sakta hai.</p></div>
+    </div>
+    <div class="callout green"><strong>Table-side service:</strong> Guest QR page se Call waiter, Request bill ya Request water bhej sakta hai. Request branch ke Service App mein aati hai. Table payment settle hone tak occupied rehti hai, chahe order serve ho chuka ho.</div>
+    <p class="small muted">Har table ka unique QR token correct table ko link karta hai. Server price aur availability dobara verify karta hai. Table reserved/maintenance ho to ordering available nahi. Internet, phone camera aur modern mobile browser chahiye; app install nahi hoti.</p>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>08</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>08 · Dashboard & settings</span></div>
     <span class="eyebrow">Daily visibility and pricing setup</span>
     <h2>Dashboard kya dikhata hai?</h2>
     <p>Dashboard authorized user ke scope mein current database se operational snapshots dikhata hai, jaise:</p>
     <div class="grid-3">
         <div class="card"><h3>Sales</h3><p>Paid, non-cancelled order totals ka currency ke hisab se summary.</p></div>
         <div class="card"><h3>Orders</h3><p>Order count aur status-wise breakdown.</p></div>
-        <div class="card"><h3>Business setup</h3><p>Organizations (platform view), branches, users, categories, products aur dining tables counts.</p></div>
+        <div class="card"><h3>Operations</h3><p>Upcoming reservations/events aur low-stock inventory counts.</p></div>
     </div>
-    <p class="small muted">Dashboard accounting ledger, tax filing return, profit-and-loss statement ya inventory valuation report nahi hai.</p>
+    <p class="small muted">Dashboard date-filtered orders/paid sales dikhata hai. Advanced Reports mein status breakdown, top-selling quantities aur low-stock watchlist bhi hai. Yeh accounting ledger, tax filing, profit-and-loss ya inventory valuation report nahi hai.</p>
     <h2>Settings se order total kaise banta hai?</h2>
     <table>
         <thead><tr><th>Order component</th><th>Calculation</th><th>When it applies</th></tr></thead>
@@ -394,11 +415,11 @@
     </table>
     <div class="callout"><strong>Illustrative example:</strong> ₹1,000 subtotal + 5% tax (₹50) + 2% service charge (₹20) = dine-in total ₹1,070. ₹40 configured delivery fee ke saath delivery total ₹1,110. Rates sirf example hain—apne business ke rules ke mutabik set karein.</div>
     <div class="callout blue"><strong>Business responsibility:</strong> Applicable tax, tax label, customer disclosures, invoice requirements aur fee policy ko accountant/legal adviser se verify karein. Software settings tax advice nahi hain.</div>
-    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>08</span></div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>09</span></div>
 </section>
 
 <section class="page">
-    <div class="page-head"><span class="brand">RestaurantOS</span><span>08 · SaaS plans & billing</span></div>
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>09 · SaaS plans & billing</span></div>
     <span class="eyebrow">Multi-restaurant subscription model</span>
     <h2>Trial aur plans ka workflow</h2>
     <p>Platform par har customer restaurant ka separate workspace aur subscription record hota hai. Signup par default 30-day trial create hota hai. Paid plans platform administrator manage/publish karta hai.</p>
@@ -419,11 +440,11 @@
     </div>
     <div class="callout"><strong>Expiry behavior:</strong> Trial/subscription expire hone par restaurant workspace aur public table QR orders block hote hain; owner billing page tak pahunchkar plan choose kar sakta hai.</div>
     <div class="callout blue"><strong>Plan feature note:</strong> Branch/staff/product/table quantity limits enforce hote hain. Plan ke feature text website par display ke liye hai; har feature ke liye alag module-level on/off control is version mein abhi nahi hai.</div>
-    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>09</span></div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>10</span></div>
 </section>
 
 <section class="page">
-    <div class="page-head"><span class="brand">RestaurantOS</span><span>09 · Platform operations</span></div>
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>10 · Platform operations</span></div>
     <span class="eyebrow">For the RestaurantOS operator</span>
     <h2>Platform Admin ki responsibilities</h2>
     <p>Platform Admin ek trusted operator role hai, restaurant owner role se alag. Is role ka use sirf SaaS operations aur customer onboarding support ke liye hona chahiye.</p>
@@ -443,11 +464,11 @@
         <li>Demo records ka review; demo account/sample data ko production customers se alag rakhein.</li>
     </ul>
     <div class="callout"><strong>Security:</strong> Admin password, APP_KEY, database credentials aur Razorpay API secrets sirf authorized deployment operator ke paas rahen. Client-facing PDF mein kabhi credentials na likhein.</div>
-    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>10</span></div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>11</span></div>
 </section>
 
 <section class="page">
-    <div class="page-head"><span class="brand">RestaurantOS</span><span>10 · Scope & transparency</span></div>
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>11 · Scope & transparency</span></div>
     <span class="eyebrow">What is included today?</span>
     <h2>Current capabilities vs. not included</h2>
     <p>Client discussion mein current supported behavior aur future/custom scope ko alag rakhna important hai.</p>
@@ -456,10 +477,10 @@
         <tbody>
             <tr><td>Responsive public pages, contact enquiry, registration, login, password reset</td><td>Native iOS/Android app, offline-first operation</td></tr>
             <tr><td>Restaurant/branch setup, role-based user access</td><td>Automated payroll, staff attendance/shift scheduling</td></tr>
-            <tr><td>Menu categories/products, images, availability and table management</td><td>Ingredient-level stock, purchase orders, supplier management or stock deductions</td></tr>
-            <tr><td>Manual dine-in/takeaway/delivery order entry and status updates</td><td>Kitchen display/KOT printer integration, live kitchen notifications</td></tr>
-            <tr><td>Table QR menu, cart, dine-in order submission and receipt summary</td><td>Guest food-order online payment, refund processing, coupons/discounts</td></tr>
-            <tr><td>Order totals, configured tax/service/delivery fee, dashboard snapshots</td><td>Accounting integration, tax filing, advanced export/BI, profit reports</td></tr>
+            <tr><td>Calendar/events, reservations, manual inventory/movements, supplier records, purchase orders with stock receiving, advanced operational reports</td><td>Recipe-based automatic ingredient deduction, accounting integration, tax filing, profit-and-loss or inventory valuation</td></tr>
+            <tr><td>Manual dine-in/takeaway/delivery order entry, held orders, status updates, discounts, partial/split tenders, invoice numbers, payment/refund ledger and cash-register reconciliation</td><td>Kitchen display/KOT printer integration, live kitchen notifications, bill split/merge and coupons</td></tr>
+            <tr><td>Table QR menu, cart, dine-in order submission and receipt summary</td><td>Guest food-order online payment or automatic refund processing through a payment gateway</td></tr>
+            <tr><td>Order totals, configured tax/service/delivery fee, date-filtered dashboard and operational reports</td><td>Advanced export/BI and formal financial statements</td></tr>
             <tr><td>Razorpay-based RestaurantOS plan checkout and billing lifecycle (after gateway setup)</td><td>Delivery marketplace integrations, rider tracking, customer loyalty/CRM campaigns</td></tr>
         </tbody>
     </table>
@@ -472,7 +493,7 @@
         <li>Plan prices, taxes and commercial terms are set by the platform operator; no defaults are promised.</li>
         <li>Application access requires internet and an active browser/device.</li>
     </ul>
-    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>11</span></div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>12</span></div>
 </section>
 
 <section class="page">
@@ -483,15 +504,17 @@
         <thead><tr><th>Time</th><th>Show</th><th>Explain</th></tr></thead>
         <tbody>
             <tr><td>1 min</td><td>Public website and signup</td><td>Restaurant gets its own workspace, first branch and trial.</td></tr>
-            <tr><td>1 min</td><td>Dashboard</td><td>Daily order, paid sales and setup counts scoped by user role.</td></tr>
+            <tr><td>1 min</td><td>Dashboard & reports</td><td>Date filters, paid sales, status breakdown, top-selling items and low-stock watchlist.</td></tr>
             <tr><td>2 min</td><td>Categories/products</td><td>Menu setup, image/price/availability controls.</td></tr>
             <tr><td>1 min</td><td>Tables and QR detail</td><td>Each table receives a unique QR link; old link is invalidated on rotation.</td></tr>
-            <tr><td>2 min</td><td>Scan QR with phone</td><td>Guest selects items, sees quantities/cart and places table order.</td></tr>
+            <tr><td>2 min</td><td>Scan QR with phone</td><td>Photo menu, search/category filters, cart totals, order confirmation and table service requests.</td></tr>
             <tr><td>1 min</td><td>Customer receipt</td><td>Order number, table, item breakdown and pay-at-restaurant status.</td></tr>
-            <tr><td>1 min</td><td>Admin orders</td><td>Team updates pending → preparing → ready → completed, then records payment.</td></tr>
+            <tr><td>1 min</td><td>Kitchen Display & Service App</td><td>Chef updates preparation status; waiter acknowledges a guest request, serves the order and records payment separately.</td></tr>
+            <tr><td>1 min</td><td>Admin orders & POS</td><td>Team holds/resumes an order, records a discount or split tender, views invoice/payment history, and reconciles the cash register.</td></tr>
             <tr><td>1 min</td><td>Billing screen / plan admin</td><td>Trial/plan status, configurable limits and payment setup prerequisite.</td></tr>
         </tbody>
     </table>
+    <p class="small"><strong>Optional operations demo:</strong> Calendar event add karein, reservation overlap check dikhayein, stock adjustment aur purchase order receive karke updated stock history verify karein.</p>
     <h2>Before a live demo</h2>
     <ul class="checklist">
         <li>Use a demo restaurant, clean menu and current demo account credentials.</li>
@@ -502,35 +525,36 @@
         <li>Explain the “not included” list before discussing custom additions.</li>
     </ul>
     <div class="callout"><strong>Demo narration:</strong> “Customer apne table ka QR scan karta hai, menu se items choose karta hai aur order submit karta hai. Staff ko order dashboard mein milta hai. Restaurant payment verify karke record karta hai; subscription billing alag Razorpay workflow hai.”</div>
-    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>12</span></div>
-</section>
-
-<section class="page">
-    <div class="page-head"><span class="brand">RestaurantOS</span><span>13 · FAQs</span></div>
-    <span class="eyebrow">Common client questions · Part 1</span>
-    <h2>FAQs</h2>
-    <div class="card no-break"><h3>Q. Kya multiple restaurants is platform ko use kar sakte hain?</h3><p>Haan. SaaS structure mein har restaurant ka alag organization/workspace, user scope aur subscription record hota hai.</p></div>
-    <div class="card no-break space-top"><h3>Q. Customer QR scan karke order kare to payment kahan hoti hai?</h3><p>Customer order online submit karta hai, par is workflow mein payment restaurant par hoti hai. Staff Cash, Card ya UPI method se payment record karta hai.</p></div>
-    <div class="card no-break space-top"><h3>Q. Razorpay order payment ke liye hai?</h3><p>Nahi. Current Razorpay integration RestaurantOS software subscription billing ke liye hai; restaurant food order checkout ke liye nahi.</p></div>
-    <div class="card no-break space-top"><h3>Q. Table QR code kahan se milega?</h3><p>Admin dashboard → Dining Tables → required table detail. Wahan se print/download karein. QR rotate karne par purana code kaam nahi karega.</p></div>
-    <div class="card no-break space-top"><h3>Q. Trial ke baad kya hoga?</h3><p>Trial/active subscription access expire hone par workspace aur customer QR ordering block hote hain. Owner billing page par plan choose kar sakta hai. Live paid checkout ke liye Razorpay secrets, matching plan ID aur webhook configuration chahiye.</p></div>
-    <div class="card no-break space-top"><h3>Q. Kya subscription price pehle se fixed hai?</h3><p>Nahi. Platform Admin plan price aur limits configure karta hai. Commercial price tabhi dikhni/checkout honi chahiye jab plan publish ho aur Razorpay recurring plan matching ho.</p></div>
     <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>13</span></div>
 </section>
 
 <section class="page">
     <div class="page-head"><span class="brand">RestaurantOS</span><span>14 · FAQs</span></div>
-    <span class="eyebrow">Common client questions · Part 2</span>
-    <h2>More frequently asked questions</h2>
-    <div class="card no-break"><h3>Q. Kya software stock aur inventory track karta hai?</h3><p>Ingredient stock, purchase orders aur supplier management current working module mein included nahi hain. Iske liye alag scope confirm karna hoga.</p></div>
-    <div class="card no-break space-top"><h3>Q. Kya internet ke bina system chalega?</h3><p>Nahi. Yeh web application hai; restaurant dashboard aur customer QR order ke liye active internet chahiye.</p></div>
-    <div class="card no-break space-top"><h3>Q. Password reset email nahi aaya to?</h3><p>Production email/SMTP settings check karein, spam folder dekhein aur hosting administrator se mail delivery verify karayein.</p></div>
-    <div class="card no-break space-top"><h3>Q. Data backup aur support kaun handle karta hai?</h3><p>Hosting/service provider ke saath backup frequency, retention, recovery owner aur support response times ko written agreement mein confirm karein.</p></div>
+    <span class="eyebrow">Common client questions · Part 1</span>
+    <h2>FAQs</h2>
+    <div class="card no-break"><h3>Q. Kya multiple restaurants is platform ko use kar sakte hain?</h3><p>Haan. SaaS structure mein har restaurant ka alag organization/workspace, user scope aur subscription record hota hai.</p></div>
+    <div class="card no-break space-top"><h3>Q. Customer QR scan karke order kare to payment kahan hoti hai?</h3><p>Customer order online submit karta hai, par is workflow mein payment restaurant par hoti hai. Staff Cash, Card, UPI ya Other method se payment record karta hai; partial/split payments bhi supported hain.</p></div>
+    <div class="card no-break space-top"><h3>Q. Razorpay order payment ke liye hai?</h3><p>Nahi. Current Razorpay integration RestaurantOS software subscription billing ke liye hai; restaurant food order checkout ke liye nahi.</p></div>
+    <div class="card no-break space-top"><h3>Q. Table QR code kahan se milega?</h3><p>Admin dashboard → Dining Tables → required table detail. Wahan se print/download karein. QR rotate karne par purana code kaam nahi karega.</p></div>
+    <div class="card no-break space-top"><h3>Q. Trial ke baad kya hoga?</h3><p>Trial/active subscription access expire hone par workspace aur customer QR ordering block hote hain. Owner billing page par plan choose kar sakta hai. Live paid checkout ke liye Razorpay secrets, matching plan ID aur webhook configuration chahiye.</p></div>
+    <div class="card no-break space-top"><h3>Q. Kya subscription price pehle se fixed hai?</h3><p>Nahi. Platform Admin plan price aur limits configure karta hai. Commercial price tabhi dikhni/checkout honi chahiye jab plan publish ho aur Razorpay recurring plan matching ho.</p></div>
     <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>14</span></div>
 </section>
 
 <section class="page">
-    <div class="page-head"><span class="brand">RestaurantOS</span><span>15 · Handover & glossary</span></div>
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>15 · FAQs</span></div>
+    <span class="eyebrow">Common client questions · Part 2</span>
+    <h2>More frequently asked questions</h2>
+    <div class="card no-break"><h3>Q. Kya software stock aur inventory track karta hai?</h3><p>Haan. Branch-level stock items, opening balance, manual in/out adjustments, movement history, low-stock thresholds, suppliers aur purchase orders available hain. Purchase order receive karne par entered quantity inventory mein add hoti hai. Menu recipes se automatic ingredient deduction abhi included nahi hai.</p></div>
+    <div class="card no-break space-top"><h3>Q. Reservation overlap aur calendar kaise kaam karte hain?</h3><p>Admin/manager branch ke events schedule kar sakte hain aur guest/table/time ke saath reservations bana sakte hain. Same table par overlapping confirmed/seated booking server block karta hai.</p></div>
+    <div class="card no-break space-top"><h3>Q. Kya internet ke bina system chalega?</h3><p>Nahi. Yeh web application hai; restaurant dashboard aur customer QR order ke liye active internet chahiye.</p></div>
+    <div class="card no-break space-top"><h3>Q. Password reset email nahi aaya to?</h3><p>Production email/SMTP settings check karein, spam folder dekhein aur hosting administrator se mail delivery verify karayein.</p></div>
+    <div class="card no-break space-top"><h3>Q. Data backup aur support kaun handle karta hai?</h3><p>Hosting/service provider ke saath backup frequency, retention, recovery owner aur support response times ko written agreement mein confirm karein.</p></div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>15</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>16 · Handover & glossary</span></div>
     <span class="eyebrow">A clear handover for your team</span>
     <h2>Client handover checklist</h2>
     <ul class="checklist">
@@ -538,6 +562,8 @@
         <li>Owner account, correct restaurant name and first branch verified.</li>
         <li>Staff roles and branch assignments reviewed by the owner.</li>
         <li>Menu, prices, unavailable items, customer-facing text and images approved.</li>
+        <li>Reservation duration/table capacity, opening inventory quantities, reorder levels and supplier details reviewed.</li>
+        <li>Purchase order receive workflow and stock movement audit history demonstrated.</li>
         <li>Tax/service/delivery settings approved by the business/accountant.</li>
         <li>Each physical table receives the matching printed QR code.</li>
         <li>QR sample order verified; staff knows order and payment recording workflow.</li>
@@ -560,7 +586,7 @@
         <p>RestaurantOS keeps table orders and restaurant operations in one connected workspace.</p>
     </div>
     <p class="small muted"><strong>Document note:</strong> Yeh guide 31 October 2026 ko available application behavior ke hisab se banayi gayi hai. Final pricing, commercial agreement, hosting/SLA, privacy notice, tax treatment aur legal terms ko service provider aur client alag se approve karein.</p>
-    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>15</span></div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>16</span></div>
 </section>
 </body>
 </html>

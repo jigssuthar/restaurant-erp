@@ -10,7 +10,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
 @endif
 <div class="admin-table-card">
-    <form method="GET" class="row g-3 mb-4">
+    <form method="GET" action="{{ route('admin.orders.index') }}" class="row g-3 mb-4" data-ajax-filter>
         <div class="col-lg-4 col-md-6"><input type="search" name="search" class="form-control" placeholder="Search order or customer" value="{{ request('search') }}"></div>
         <div class="col-lg-3 col-md-6"><select name="branch_id" class="form-select">
             <option value="">All branches</option>
@@ -45,7 +45,7 @@
                 <td>{{ $order->currency_code }} {{ number_format((float) $order->total, 2) }}</td>
                 <td><span class="badge {{ $order->status === 'completed' ? 'bg-success' : ($order->status === 'cancelled' ? 'bg-danger' : 'bg-warning text-dark') }}">
                     {{ ucfirst($order->status) }}</span></td>
-                <td><span class="badge {{ $order->payment_status === 'paid' ? 'bg-success' : 'bg-secondary' }}">{{ ucfirst($order->payment_status) }}</span></td>
+                <td><span class="badge {{ $order->payment_status === 'paid' ? 'bg-success' : (in_array($order->payment_status, ['partial','partially_refunded'], true) ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ ucfirst(str_replace('_', ' ', $order->payment_status)) }}</span></td>
             </tr>
         @empty
             <tr><td colspan="7" class="text-center text-muted py-5">No orders found.</td></tr>

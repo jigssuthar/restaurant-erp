@@ -30,7 +30,7 @@
     <div class="admin-card">
         <h5 class="fw-bold mb-1">{{ $organization->name }}</h5>
         <p class="text-muted mb-4">These settings apply across all branches in this organization.</p>
-        <form action="{{ route('admin.settings.update') }}" method="POST">
+        <form action="{{ route('admin.settings.update') }}" method="POST" data-ajax-form>
             @csrf
             @method('PUT')
             <input type="hidden" name="organization_id" value="{{ $organization->id }}">

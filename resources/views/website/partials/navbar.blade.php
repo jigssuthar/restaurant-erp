@@ -69,11 +69,18 @@
             </ul>
 
             <div class="d-flex gap-2 mt-3 mt-lg-0">
-
-                <a href="{{ route('login') }}" class="btn btn-outline-orange">Login</a>
-
-                <a href="{{ route('register') }}"
-                   class="btn btn-orange">Get Started</a>
+                @auth
+                    @if(auth()->user()->hasAnyRole('waiter', 'captain'))
+                        <a href="{{ route('service-app.index') }}" class="btn btn-orange">Service App</a>
+                    @elseif(auth()->user()->hasAnyRole('chef', 'kitchen_manager'))
+                        <a href="{{ route('kitchen-display.index') }}" class="btn btn-orange">Kitchen Display</a>
+                    @else
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-orange">Dashboard</a>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-outline-orange">Login</a>
+                    <a href="{{ route('register') }}" class="btn btn-orange">Get Started</a>
+                @endauth
 
             </div>
 

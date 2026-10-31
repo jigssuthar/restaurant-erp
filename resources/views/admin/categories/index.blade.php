@@ -23,7 +23,7 @@
 @endif
 
 <div class="admin-table-card">
-    <form method="GET" class="row g-3 mb-4">
+    <form method="GET" action="{{ route('admin.categories.index') }}" class="row g-3 mb-4" data-ajax-filter>
         <div class="col-lg-4 col-md-6">
             <input type="search" name="search" class="form-control" placeholder="Search category or branch"
                    value="{{ request('search') }}">
@@ -83,7 +83,7 @@
                                     <li><a class="dropdown-item" href="{{ route('admin.categories.show', $category) }}">View</a></li>
                                     <li><a class="dropdown-item" href="{{ route('admin.categories.edit', $category) }}">Edit</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><form action="{{ route('admin.categories.destroy', $category) }}" method="POST"
+                                    <li><form action="{{ route('admin.categories.destroy', $category) }}" method="POST" data-ajax-form
                                               onsubmit="return confirm('Delete this category?')">
                                         @csrf @method('DELETE')
                                         <button class="dropdown-item text-danger" type="submit">Delete</button>

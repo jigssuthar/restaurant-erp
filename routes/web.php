@@ -118,7 +118,17 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SaasPlanController;
 use App\Http\Controllers\Admin\BillingController;
+use App\Http\Controllers\Admin\CalendarController;
+use App\Http\Controllers\Admin\CashRegisterController;
+use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Admin\PurchaseOrderController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ReservationController;
+use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\CustomerTableOrderController;
+use App\Http\Controllers\CustomerTableServiceRequestController;
+use App\Http\Controllers\Admin\KitchenDisplayController;
+use App\Http\Controllers\Admin\ServiceAppController;
 
 Route::get('/table/{token}', [CustomerTableOrderController::class, 'menu'])
     ->middleware('subscription')
@@ -126,9 +136,36 @@ Route::get('/table/{token}', [CustomerTableOrderController::class, 'menu'])
 Route::post('/table/{token}/orders', [CustomerTableOrderController::class, 'store'])
     ->middleware(['throttle:10,1', 'subscription'])
     ->name('qr.orders.store');
+Route::post('/table/{token}/service-requests', [CustomerTableServiceRequestController::class, 'store'])
+    ->middleware(['throttle:5,1', 'subscription'])
+    ->name('qr.service-requests.store');
 Route::post('/billing/razorpay/webhook', [BillingController::class, 'webhook'])
     ->middleware('throttle:120,1')
     ->name('razorpay.webhook');
+
+Route::middleware(['auth', 'subscription'])
+    ->prefix('kitchen-display')
+    ->name('kitchen-display.')
+    ->group(function () {
+        Route::middleware('role:admin,manager,staff,chef,kitchen_manager')->group(function () {
+            Route::get('/', [KitchenDisplayController::class, 'index'])->name('index');
+            Route::get('/feed', [KitchenDisplayController::class, 'feed'])->name('feed');
+            Route::patch('/orders/{order}/status', [KitchenDisplayController::class, 'updateStatus'])->name('orders.status');
+        });
+    });
+
+Route::middleware(['auth', 'subscription'])
+    ->prefix('service-app')
+    ->name('service-app.')
+    ->group(function () {
+        Route::middleware('role:admin,manager,staff,waiter,captain')->group(function () {
+            Route::get('/', [ServiceAppController::class, 'index'])->name('index');
+            Route::get('/feed', [ServiceAppController::class, 'feed'])->name('feed');
+            Route::patch('/orders/{order}/status', [ServiceAppController::class, 'updateOrderStatus'])->name('orders.status');
+            Route::patch('/requests/{serviceRequest}/status', [ServiceAppController::class, 'updateServiceRequest'])->name('requests.status');
+            Route::post('/orders/{order}/payments', [OrderController::class, 'recordPayments'])->name('orders.payments.store');
+        });
+    });
 
 Route::middleware(['auth', 'subscription'])
     ->prefix('admin')
@@ -164,15 +201,42 @@ Route::middleware(['auth', 'subscription'])
                 ->parameters(['dining-tables' => 'diningTable']);
             Route::post('/dining-tables/{diningTable}/qr/rotate', [DiningTableController::class, 'rotateQr'])
                 ->name('dining-tables.qr.rotate');
+
+            Route::resource('calendar', CalendarController::class)->except(['show']);
+            Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
+            Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
+            Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+            Route::patch('/reservations/{reservation}/status', [ReservationController::class, 'updateStatus'])
+                ->name('reservations.status');
+            Route::resource('inventory', InventoryController::class)->except(['show', 'destroy']);
+            Route::get('/inventory/{inventory}/movements', [InventoryController::class, 'movements'])
+                ->name('inventory.movements');
+            Route::patch('/inventory/{inventory}/adjust', [InventoryController::class, 'adjust'])
+                ->name('inventory.adjust');
+            Route::resource('suppliers', SupplierController::class)->except(['show']);
+            Route::get('/purchase-orders', [PurchaseOrderController::class, 'index'])->name('purchase-orders.index');
+            Route::get('/purchase-orders/create', [PurchaseOrderController::class, 'create'])->name('purchase-orders.create');
+            Route::post('/purchase-orders', [PurchaseOrderController::class, 'store'])->name('purchase-orders.store');
+            Route::get('/purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'show'])->name('purchase-orders.show');
+            Route::patch('/purchase-orders/{purchaseOrder}/status', [PurchaseOrderController::class, 'updateStatus'])
+                ->name('purchase-orders.status');
+            Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         });
 
         Route::middleware('role:admin,manager,staff')->group(function () {
+            Route::get('/cash-register', [CashRegisterController::class, 'index'])->name('cash-register.index');
+            Route::post('/cash-register/open', [CashRegisterController::class, 'open'])->name('cash-register.open');
+            Route::patch('/cash-register/{session}/close', [CashRegisterController::class, 'close'])->name('cash-register.close');
             Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
             Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
             Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
             Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
             Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
             Route::patch('/orders/{order}/payment', [OrderController::class, 'markPaid'])->name('orders.payment');
+            Route::post('/orders/{order}/payments', [OrderController::class, 'recordPayments'])
+                ->name('orders.payments.store');
+            Route::post('/orders/{order}/refunds', [OrderController::class, 'refund'])
+                ->name('orders.refund');
             Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
             Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
             Route::get('/products', [ProductController::class, 'index'])->name('products.index');

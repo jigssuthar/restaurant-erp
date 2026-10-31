@@ -34,6 +34,16 @@ class DiningTable extends Model
         return $this->hasMany(Order::class);
     }
 
+    public function serviceRequests(): HasMany
+    {
+        return $this->hasMany(TableServiceRequest::class);
+    }
+
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
     public function rotateQrToken(): void
     {
         $this->forceFill(['qr_token' => Str::random(64)])->save();
