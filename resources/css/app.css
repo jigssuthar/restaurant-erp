@@ -1,0 +1,438 @@
+
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+@import "./website.css";
+
+/* =========================
+   GLOBAL SETTINGS
+========================= */
+
+:root {
+    --primary: #f97316;
+    --primary-dark: #ea580c;
+    --dark: #172033;
+    --text: #475569;
+    --light: #f8fafc;
+    --border: #e9edf2;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    color: var(--dark);
+    overflow-x: hidden;
+    background: #fff;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+a {
+    text-decoration: none;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
+.site-navbar {
+    background: #fff;
+    box-shadow: 0 3px 20px rgba(0,0,0,.06);
+    z-index: 1000;
+}
+
+.brand {
+    font-size: 25px;
+    font-weight: 800;
+    color: var(--dark);
+    white-space: nowrap;
+}
+
+.brand span {
+    color: var(--primary);
+}
+
+.site-navbar .nav-link {
+    color: #475569;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px !important;
+}
+
+.site-navbar .nav-link:hover,
+.site-navbar .nav-link.active {
+    color: var(--primary);
+}
+
+.dropdown-menu {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+
+.dropdown-item {
+    padding: 10px 14px;
+    border-radius: 7px;
+}
+
+.dropdown-item:hover {
+    color: var(--primary);
+    background: #fff7ed;
+}
+
+.navbar-toggler {
+    border: 1px solid #e2e8f0;
+    padding: 8px 10px;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn-orange {
+    background: var(--primary);
+    color: white;
+    border: 1px solid var(--primary);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: .2s;
+}
+
+.btn-orange:hover {
+    background: var(--primary-dark);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-outline-orange {
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.btn-outline-orange:hover {
+    background: var(--primary);
+    color: white;
+}
+
+/* =========================
+   HERO SECTION
+========================= */
+
+.section-space {
+    padding: 85px 0;
+}
+
+.hero-section {
+    background: linear-gradient(120deg, #fff7ed, #fff);
+    padding: 90px 0;
+}
+
+.hero-title {
+    font-size: clamp(34px, 5vw, 58px);
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+}
+
+.hero-description {
+    font-size: 18px;
+    color: var(--text);
+    line-height: 1.8;
+}
+
+.text-orange {
+    color: var(--primary);
+}
+
+.section-heading {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.section-description {
+    color: #64748b;
+    line-height: 1.8;
+}
+
+.inner-hero {
+    padding: 85px 0;
+    background: linear-gradient(120deg, #fff7ed, #fff);
+}
+
+/* =========================
+   FEATURE CARDS
+========================= */
+
+.feature-box {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    height: 100%;
+    transition: all .25s ease;
+}
+
+.feature-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,.07);
+}
+
+.feature-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: #fff1e7;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 18px;
+}
+
+.bg-soft {
+    background: #fff7ed;
+}
+
+/* =========================
+   PRICING
+========================= */
+
+.price-card {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+    height: 100%;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.site-footer {
+    background: #111827;
+    color: #cbd5e1;
+    padding: 65px 0 20px;
+}
+
+.site-footer h6 {
+    color: white;
+}
+
+.site-footer a {
+    color: #cbd5e1;
+    transition: .2s;
+}
+
+.site-footer a:hover {
+    color: #fb923c;
+}
+
+.site-footer p {
+    margin-bottom: 12px;
+}
+
+/* =========================
+   FORMS
+========================= */
+
+.form-control,
+.form-select {
+    min-height: 46px;
+    border-radius: 8px;
+    border-color: #e2e8f0;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 .2rem rgba(249,115,22,.12);
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 991.98px) {
+
+    .section-space {
+        padding: 65px 0;
+    }
+
+    .hero-section {
+        padding: 65px 0;
+    }
+
+    .site-navbar .navbar-collapse {
+        padding: 15px 0;
+    }
+
+    .site-navbar .navbar-nav {
+        gap: 0 !important;
+    }
+
+    .site-navbar .nav-link {
+        padding: 10px 5px !important;
+    }
+
+    .site-navbar .dropdown-menu {
+        box-shadow: none;
+    }
+
+    .site-navbar .d-flex {
+        flex-wrap: wrap;
+    }
+
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 767.98px) {
+
+    .section-space {
+        padding: 48px 0;
+    }
+
+    .hero-section {
+        padding: 50px 0;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 36px;
+        letter-spacing: -1px;
+    }
+
+    .hero-description {
+        font-size: 16px;
+    }
+
+    .section-heading {
+        font-size: 29px;
+    }
+
+    .inner-hero {
+        padding: 50px 0;
+        text-align: center;
+    }
+
+    .feature-box {
+        padding: 22px;
+    }
+
+    .feature-icon {
+        margin-bottom: 15px;
+    }
+
+    .site-footer {
+        padding: 45px 0 20px;
+    }
+
+    .site-footer .row {
+        row-gap: 25px;
+    }
+
+    .btn-orange,
+    .btn-outline-orange {
+        padding: 11px 16px;
+        font-size: 14px;
+    }
+
+    .navbar .brand {
+        font-size: 22px;
+    }
+
+}
+
+/* =========================
+   SMALL MOBILE
+========================= */
+
+@media (max-width: 400px) {
+
+    .hero-title {
+        font-size: 30px;
+    }
+
+    .section-heading {
+        font-size: 25px;
+    }
+
+    .feature-box {
+        padding: 18px;
+    }
+
+    .hero-section .btn {
+        width: 100%;
+        margin: 5px 0 !important;
+    }
+
+}
+
+/* Organization pages */
+
+.organization-table tbody tr:hover {
+    background: #fffaf6;
+}
+
+.admin-card,
+.admin-table-card {
+    border: 1px solid #edf0f4;
+    box-shadow: 0 4px 15px rgba(15,23,42,.025);
+}
+
+.admin-content .form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.admin-content .form-control,
+.admin-content .form-select {
+    min-height: 45px;
+}
+
+.admin-content textarea.form-control {
+    min-height: auto;
+}
+
+@media(max-width:767px) {
+    .admin-content h3 {
+        font-size: 23px;
+    }
+
+    .admin-card {
+        padding: 18px;
+    }
+
+    .admin-table-card {
+        padding: 14px;
+    }
+}

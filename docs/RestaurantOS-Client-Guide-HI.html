@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RestaurantOS | Client Product Guide</title>
+    <style>
+        :root {
+            --ink: #172033;
+            --muted: #64748b;
+            --orange: #e96821;
+            --orange-soft: #fff2e9;
+            --navy: #172b4d;
+            --blue-soft: #edf5ff;
+            --green: #18764b;
+            --green-soft: #eaf7ef;
+            --line: #e5eaf0;
+            --paper: #fff;
+        }
+
+        * { box-sizing: border-box; }
+        html { background: #e9edf2; }
+        body {
+            margin: 0;
+            color: var(--ink);
+            background: #e9edf2;
+            font: 10pt/1.48 "Nirmala UI", "Segoe UI", Arial, sans-serif;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .page {
+            position: relative;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 10mm auto;
+            padding: 18mm 18mm 19mm;
+            background: var(--paper);
+            box-shadow: 0 3mm 14mm #18233818;
+            overflow: hidden;
+            page-break-after: always;
+            break-after: page;
+        }
+        .page:last-child { page-break-after: auto; break-after: auto; }
+        .page-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 4mm;
+            border-bottom: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 8pt;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+        .brand { color: var(--orange); font-weight: 800; letter-spacing: .06em; }
+        .page-foot {
+            position: absolute;
+            right: 18mm;
+            bottom: 9mm;
+            left: 18mm;
+            display: flex;
+            justify-content: space-between;
+            padding-top: 3mm;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 8pt;
+        }
+        h1, h2, h3, p { margin-top: 0; }
+        h1 { margin-bottom: 5mm; font-size: 30pt; line-height: 1.12; letter-spacing: -.025em; }
+        h2 { margin: 7mm 0 3mm; color: var(--navy); font-size: 19pt; line-height: 1.2; }
+        h3 { margin: 0 0 2mm; color: var(--navy); font-size: 11pt; }
+        p { margin-bottom: 3mm; }
+        ul, ol { margin: 2mm 0 4mm; padding-left: 6mm; }
+        li { margin: 1.1mm 0; }
+        .eyebrow {
+            display: inline-block;
+            margin: 8mm 0 3mm;
+            color: var(--orange);
+            font-size: 8pt;
+            font-weight: 800;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+        .lead { max-width: 155mm; color: #43516a; font-size: 13pt; line-height: 1.5; }
+        .muted { color: var(--muted); }
+        .small { font-size: 8.5pt; }
+        .tiny { font-size: 7.5pt; }
+        .cover {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 260mm;
+        }
+        .cover-art {
+            position: relative;
+            display: grid;
+            min-height: 91mm;
+            margin: 12mm 0;
+            padding: 13mm;
+            align-content: center;
+            border-radius: 8mm;
+            color: #fff;
+            background: linear-gradient(128deg, #162949 0%, #274a70 67%, #e96821 170%);
+            overflow: hidden;
+        }
+        .cover-art:after {
+            position: absolute;
+            right: -17mm;
+            bottom: -34mm;
+            width: 105mm;
+            height: 105mm;
+            border: 1px solid #ffffff37;
+            border-radius: 50%;
+            content: "";
+            box-shadow: 0 0 0 15mm #ffffff09, 0 0 0 31mm #ffffff08;
+        }
+        .cover-art h2 { max-width: 130mm; margin: 0 0 4mm; color: #fff; font-size: 24pt; }
+        .cover-art p { max-width: 125mm; color: #e6edf7; font-size: 12pt; }
+        .cover-meta { color: var(--muted); font-size: 9pt; }
+        .grid-2, .grid-3 { display: grid; gap: 4mm; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .card {
+            padding: 4mm;
+            border: 1px solid var(--line);
+            border-radius: 3mm;
+            background: #fff;
+            break-inside: avoid;
+        }
+        .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+        .callout {
+            margin: 4mm 0;
+            padding: 4mm 5mm;
+            border-left: 1.2mm solid var(--orange);
+            border-radius: 0 2mm 2mm 0;
+            background: var(--orange-soft);
+            break-inside: avoid;
+        }
+        .callout.blue { border-color: #3b82c4; background: var(--blue-soft); }
+        .callout.green { border-color: var(--green); background: var(--green-soft); }
+        .step {
+            display: grid;
+            grid-template-columns: 9mm 1fr;
+            gap: 3mm;
+            margin: 3mm 0;
+            align-items: start;
+            break-inside: avoid;
+        }
+        .num {
+            display: grid;
+            width: 8mm;
+            height: 8mm;
+            place-items: center;
+            border-radius: 50%;
+            color: #fff;
+            background: var(--orange);
+            font-weight: 800;
+        }
+        .flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2mm;
+            align-items: center;
+            margin: 5mm 0;
+        }
+        .flow span {
+            padding: 2mm 3mm;
+            border: 1px solid #f1c6a9;
+            border-radius: 2mm;
+            color: #813b15;
+            background: var(--orange-soft);
+            font-size: 8.5pt;
+            font-weight: 700;
+        }
+        .flow b { color: #96a2b3; }
+        table {
+            width: 100%;
+            margin: 3mm 0 5mm;
+            border-collapse: collapse;
+            font-size: 8.7pt;
+        }
+        th, td { padding: 2.5mm 3mm; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+        th { color: var(--navy); background: #f3f6fa; }
+        .pill {
+            display: inline-block;
+            margin: 0 1mm 1mm 0;
+            padding: 1mm 2.2mm;
+            border-radius: 8mm;
+            color: var(--navy);
+            background: #edf2f8;
+            font-size: 7.5pt;
+            font-weight: 700;
+        }
+        .checklist { list-style: none; padding-left: 0; }
+        .checklist li { margin: 2mm 0; }
+        .checklist li:before { margin-right: 2mm; color: var(--green); font-weight: 800; content: "✓"; }
+        .warning-list li:before { color: var(--orange); content: "•"; }
+        .toc a { color: var(--navy); text-decoration: none; }
+        .toc li { margin: 2mm 0; }
+        .space-top { margin-top: 6mm; }
+        .no-break { break-inside: avoid; }
+
+        @page { size: A4; margin: 0; }
+        @media print {
+            html, body { width: 210mm; margin: 0; background: #fff; }
+            .page { width: 210mm; min-height: 297mm; margin: 0; padding: 15mm 18mm 16mm; box-shadow: none; }
+            .cover { min-height: 235mm; }
+        }
+    </style>
+</head>
+<body>
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>Client Product Guide</span></div>
+    <div class="cover">
+        <div>
+            <span class="eyebrow">Restaurant operations made clearer</span>
+            <h1>RestaurantOS<br>Client Guide</h1>
+            <p class="lead">Restaurant ke daily operations, table QR orders, team access aur subscription workflow ko simple language mein samjhein.</p>
+            <div class="cover-art">
+                <h2>One workspace.<br>Connected restaurant operations.</h2>
+                <p>Menu se table tak, order se payment record tak—team ko ek connected view.</p>
+                <div class="flow"><span>Menu</span><b>→</b><span>QR / Staff order</span><b>→</b><span>Kitchen workflow</span><b>→</b><span>Payment record</span></div>
+            </div>
+            <div class="grid-3">
+                <div class="card"><h3>Operate</h3><p class="small">Branches, menu, tables aur staff organize karein.</p></div>
+                <div class="card"><h3>Serve</h3><p class="small">Orders ko clear status ke saath process karein.</p></div>
+                <div class="card"><h3>Grow</h3><p class="small">SaaS workspace aur subscription structure ke saath scale karein.</p></div>
+            </div>
+        </div>
+        <div class="cover-meta">
+            <strong>Version 1.0</strong><br>
+            Product overview and operating guide · 31 October 2026<br>
+            Prepared for client demonstration
+        </div>
+    </div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>Product overview</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>01 · Overview</span></div>
+    <span class="eyebrow">The product at a glance</span>
+    <h2>RestaurantOS kya karta hai?</h2>
+    <p class="lead">RestaurantOS ek web-based restaurant management platform hai. Restaurant owner apna online workspace banata hai; team usmein branches, menu, tables aur customer orders manage karti hai.</p>
+    <div class="grid-2 space-top">
+        <div class="card"><h3>Website & account</h3><p>Public website, contact form, account registration, login aur password reset ke entry points.</p></div>
+        <div class="card"><h3>Restaurant workspace</h3><p>Dashboard, branches, categories, products, dining tables, QR links, orders, staff aur settings.</p></div>
+        <div class="card"><h3>Guest QR experience</h3><p>Customer table ka QR scan karke menu dekhta, items select karta aur order summary receive karta hai.</p></div>
+        <div class="card"><h3>SaaS administration</h3><p>Platform operator multiple restaurant accounts, configurable subscription plans aur billing status manage kar sakta hai.</p></div>
+    </div>
+    <h2>Typical customer journey</h2>
+    <div class="flow"><span>Restaurant signup</span><b>→</b><span>Workspace setup</span><b>→</b><span>Menu & tables</span><b>→</b><span>QR print</span><b>→</b><span>Guest order</span><b>→</b><span>Team processes order</span></div>
+    <div class="callout blue"><strong>System ka purpose:</strong> restaurant ke basic dine-in operations ko ek jagah lana. Yeh guide available workflow samjhata hai; yeh accounting, inventory ya food-delivery marketplace ka claim nahi karta.</div>
+    <h2>Is guide mein</h2>
+    <ul class="toc">
+        <li>Workspace roles aur tenant data separation</li>
+        <li>Restaurant setup: branch, menu, table, QR</li>
+        <li>Staff orders, status flow, payment record aur settings</li>
+        <li>Customer QR ordering ka end-to-end experience</li>
+        <li>Trial, plans, limits aur Razorpay subscription billing</li>
+        <li>Current scope, exclusions, demo checklist aur FAQs</li>
+    </ul>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>02</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>02 · Accounts & access</span></div>
+    <span class="eyebrow">Who uses the system?</span>
+    <h2>Roles aur access ka simple breakdown</h2>
+    <p>Har restaurant ka account ek alag workspace hota hai. Restaurant users apne organization ke data par kaam karte hain; platform administrator SaaS-level setup karta hai.</p>
+    <table>
+        <thead><tr><th>Role</th><th>Kaun?</th><th>Typical access</th></tr></thead>
+        <tbody>
+            <tr><td><strong>Platform Admin</strong></td><td>RestaurantOS operator</td><td>Organizations, plan configuration aur platform-level administration.</td></tr>
+            <tr><td><strong>Restaurant Owner / Admin</strong></td><td>Restaurant workspace ka owner</td><td>Apne restaurant ka dashboard, branches, menu, tables, orders, settings, staff aur billing.</td></tr>
+            <tr><td><strong>Manager</strong></td><td>Restaurant operations lead</td><td>Apne organization ke branches aur day-to-day operations; platform-wide data nahi.</td></tr>
+            <tr><td><strong>Staff</strong></td><td>Outlet team member</td><td>Assigned branch ke orders aur permitted read-only screens.</td></tr>
+            <tr><td><strong>Guest</strong></td><td>Restaurant customer</td><td>Login ke bina table QR menu dekhe aur dine-in order submit kare.</td></tr>
+        </tbody>
+    </table>
+    <div class="callout green"><strong>Data separation:</strong> ek restaurant ka owner doosre restaurant ka staff, menu, orders ya branches nahi dekh sakta. Platform administrator ke cross-tenant controls alag rakhe gaye hain.</div>
+    <h2>Restaurant owner account kaise banta hai?</h2>
+    <div class="step"><span class="num">1</span><div><h3>Signup details enter karein</h3><p>Owner name, email, restaurant name, first branch name aur password.</p></div></div>
+    <div class="step"><span class="num">2</span><div><h3>Workspace ready hota hai</h3><p>System restaurant organization, pehli branch, default settings aur owner account create karta hai.</p></div></div>
+    <div class="step"><span class="num">3</span><div><h3>Trial start hota hai</h3><p>Default trial duration 30 days hai; platform configuration ke mutabik duration badal sakti hai.</p></div></div>
+    <div class="callout"><strong>Password safety:</strong> account password strong rakhein, kisi ke saath share na karein, aur har employee ko apna separate account dein. Registration aur staff account passwords kam-se-kam 12 characters hone chahiye.</div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>03</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>03 · Getting started</span></div>
+    <span class="eyebrow">First-time workspace setup</span>
+    <h2>Restaurant ko live use ke liye prepare karein</h2>
+    <p>Demo ya production mein pehle basic business details aur menu sahi set karein. Live QR cards print karne se pehle domain, HTTPS aur table links test karein.</p>
+    <div class="step"><span class="num">1</span><div><h3>Business details verify karein</h3><p>Restaurant/organization profile, primary email, business status aur contact information.</p></div></div>
+    <div class="step"><span class="num">2</span><div><h3>Branches add karein</h3><p>Har physical outlet ka naam, unique branch code, address, contact aur active/inactive status enter karein.</p></div></div>
+    <div class="step"><span class="num">3</span><div><h3>Categories banayein</h3><p>Menu ko sections mein divide karein, jaise Starters, Main Course, Beverages aur Desserts.</p></div></div>
+    <div class="step"><span class="num">4</span><div><h3>Products add karein</h3><p>Product name, category, price, cost price, type, optional SKU, description, photo aur availability set karein.</p></div></div>
+    <div class="step"><span class="num">5</span><div><h3>Dining tables banayein</h3><p>Branch select karein, table number/capacity add karein aur status (available, occupied, reserved, maintenance) maintain karein.</p></div></div>
+    <div class="step"><span class="num">6</span><div><h3>Tax, currency aur fees set karein</h3><p>Organization Settings mein currency, tax label/rate, service charge, delivery fee aur receipt header/footer configure karein.</p></div></div>
+    <div class="step"><span class="num">7</span><div><h3>Staff invite/create karke test karein</h3><p>Har employee ka role aur branch assignment set karein. Owner/manager se test order bana kar workflow check karein.</p></div></div>
+    <div class="callout blue"><strong>Live tip:</strong> Browser se image upload karte waqt JPG, PNG ya WEBP image 2 MB se chhoti honi chahiye. Har branch par menu aur tax setup ko alag se verify karein.</div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>04</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>04 · Operations</span></div>
+    <span class="eyebrow">Manage branches, menus & tables</span>
+    <h2>Core restaurant modules</h2>
+    <div class="grid-2">
+        <div class="card"><h3>Branches</h3><p>Restaurant ke outlets organize karein. Branch code organization ke andar unique hota hai. Owner/manager ko apni organization ka data hi dikhai deta hai.</p></div>
+        <div class="card"><h3>Categories</h3><p>Customer-facing menu groups set karein. Category ko deactivate karke uske products ko guest menu se hide kiya ja sakta hai.</p></div>
+        <div class="card"><h3>Products & menu</h3><p>Price, cost price, category, image, description aur available/unavailable status update karein. Customer order mein product ka price server se calculate hota hai.</p></div>
+        <div class="card"><h3>Dining tables</h3><p>Table number/capacity aur operational status dekhein. Active orders hone par system table ko available mark karne se rokta hai.</p></div>
+        <div class="card"><h3>Staff management</h3><p>Owner/authorized administrator team accounts create/update karein. Staff ko branch assign karein aur sirf zaroori role dein.</p></div>
+        <div class="card"><h3>Search & filters</h3><p>Supported lists mein name/code, branch, status, order type ya order number se records dhoondhein. Lists paginated hain.</p></div>
+    </div>
+    <h2>Table QR kahan milega?</h2>
+    <ol>
+        <li>Dashboard se <strong>Dining Tables</strong> kholein.</li>
+        <li>Table detail page open karein.</li>
+        <li>Us table ka QR print ya download karein.</li>
+        <li>Restaurant mein sahi physical table par QR card lagayein.</li>
+    </ol>
+    <div class="callout"><strong>QR replace karna:</strong> QR rotate karne se purana link invalid ho jata hai. Naya code print karke hi table par lagayein; stale QR se guest order nahi kar payega.</div>
+    <p class="small muted">Menu mein inactive categories/unavailable products nahi dikhte. Isse sold-out item ko customer se temporarily hide kiya ja sakta hai.</p>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>05</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>05 · Orders & payments</span></div>
+    <span class="eyebrow">From order to completion</span>
+    <h2>Order management workflow</h2>
+    <p>Staff dashboard se order create kar sakte hain, ya customer table QR se. Har order ke saath branch, item names, quantities aur order-time price record hota hai.</p>
+    <div class="flow"><span>Pending</span><b>→</b><span>Preparing</span><b>→</b><span>Ready</span><b>→</b><span>Completed</span></div>
+    <p>Order ko permitted workflow ke mutabik cancel kiya ja sakta hai. Completed/cancelled orders final states hain. Paid order cancel karne ke liye refund workflow is version mein available nahi hai.</p>
+    <h2>Order types</h2>
+    <div class="grid-3">
+        <div class="card"><h3>Dine-in</h3><p>Dining table se linked. Staff ya table QR se create ho sakta hai.</p></div>
+        <div class="card"><h3>Takeaway</h3><p>Restaurant staff order enter karta hai; guest QR workflow table dine-in ke liye hai.</p></div>
+        <div class="card"><h3>Delivery</h3><p>Staff customer name aur delivery address enter karta hai; configured delivery fee apply hoti hai.</p></div>
+    </div>
+    <h2>Payment kaise record hota hai?</h2>
+    <table>
+        <thead><tr><th>Payment option</th><th>System behavior</th></tr></thead>
+        <tbody>
+            <tr><td>Cash</td><td>Restaurant par payment milne ke baad staff payment status Paid karke Cash select karta hai.</td></tr>
+            <tr><td>Card</td><td>External card terminal par payment ke baad staff record karta hai. RestaurantOS card terminal ko charge nahi karta.</td></tr>
+            <tr><td>UPI</td><td>Restaurant ke UPI QR/app par payment ke baad staff UPI method select karke record karta hai.</td></tr>
+            <tr><td>Pending</td><td>Payment baad mein lena hai to order pending rehta hai. QR dine-in order initially unpaid rehta hai.</td></tr>
+        </tbody>
+    </table>
+    <div class="callout blue"><strong>Important distinction:</strong> Razorpay subscription checkout restaurant ke RestaurantOS plan ki payment ke liye hai. Yeh feature guest ke food order ka online payment process nahi karta.</div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>06</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>06 · Guest QR ordering</span></div>
+    <span class="eyebrow">A smooth table-side experience</span>
+    <h2>Customer QR se order kaise deta hai?</h2>
+    <div class="step"><span class="num">1</span><div><h3>Table-specific QR scan</h3><p>Guest phone camera se apne table par laga QR scan karta hai. Login ya app install ki zaroorat nahi.</p></div></div>
+    <div class="step"><span class="num">2</span><div><h3>Available menu browse</h3><p>Usi branch ke active categories aur available products customer ko dikhte hain.</p></div></div>
+    <div class="step"><span class="num">3</span><div><h3>Items select karein</h3><p>Quantity select/change karne par cart, selected items aur estimated total screen par update hote hain.</p></div></div>
+    <div class="step"><span class="num">4</span><div><h3>Order place karein</h3><p>Optional name, phone ya notes ke saath order submit hota hai. Server availability aur current product prices verify karke total banata hai.</p></div></div>
+    <div class="step"><span class="num">5</span><div><h3>Order summary dekhein</h3><p>Confirmation par order number, table, date/time, items, quantity, line totals, subtotal, tax, service charge aur total dikhte hain.</p></div></div>
+    <div class="step"><span class="num">6</span><div><h3>Restaurant mein pay karein</h3><p>QR order unpaid hai; customer payment restaurant staff ko deta hai. Staff dashboard mein payment method record karta hai.</p></div></div>
+    <div class="callout green"><strong>Correct table routing:</strong> Har table ka unique QR token us table ko order se link karta hai. Active menu items aur status server par dobara check hote hain; customer browser se bheja hua price accept nahi hota.</div>
+    <h2>Guest ko kya chahiye?</h2>
+    <p>Internet access, camera/QR scanning aur modern mobile browser. Ordering experience responsive web page hai; alag mobile app install nahi karni hoti.</p>
+    <p class="small muted">Table reserved ya maintenance status mein ho to QR menu/order available nahi hota. Table occupied ho lekin active ho to additional QR order allowed hai.</p>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>07</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>07 · Dashboard & settings</span></div>
+    <span class="eyebrow">Daily visibility and pricing setup</span>
+    <h2>Dashboard kya dikhata hai?</h2>
+    <p>Dashboard authorized user ke scope mein current database se operational snapshots dikhata hai, jaise:</p>
+    <div class="grid-3">
+        <div class="card"><h3>Sales</h3><p>Paid, non-cancelled order totals ka currency ke hisab se summary.</p></div>
+        <div class="card"><h3>Orders</h3><p>Order count aur status-wise breakdown.</p></div>
+        <div class="card"><h3>Business setup</h3><p>Organizations (platform view), branches, users, categories, products aur dining tables counts.</p></div>
+    </div>
+    <p class="small muted">Dashboard accounting ledger, tax filing return, profit-and-loss statement ya inventory valuation report nahi hai.</p>
+    <h2>Settings se order total kaise banta hai?</h2>
+    <table>
+        <thead><tr><th>Order component</th><th>Calculation</th><th>When it applies</th></tr></thead>
+        <tbody>
+            <tr><td>Subtotal</td><td>Current item price × quantity ka sum</td><td>All orders</td></tr>
+            <tr><td>Tax</td><td>Subtotal × configured tax rate</td><td>All orders</td></tr>
+            <tr><td>Service charge</td><td>Subtotal × configured service-charge rate</td><td>All orders</td></tr>
+            <tr><td>Delivery fee</td><td>Organization setting ka fixed fee</td><td>Delivery orders only</td></tr>
+            <tr><td>Discount</td><td>Discount/coupon feature is release mein nahi</td><td>Not applied</td></tr>
+        </tbody>
+    </table>
+    <div class="callout"><strong>Illustrative example:</strong> ₹1,000 subtotal + 5% tax (₹50) + 2% service charge (₹20) = dine-in total ₹1,070. ₹40 configured delivery fee ke saath delivery total ₹1,110. Rates sirf example hain—apne business ke rules ke mutabik set karein.</div>
+    <div class="callout blue"><strong>Business responsibility:</strong> Applicable tax, tax label, customer disclosures, invoice requirements aur fee policy ko accountant/legal adviser se verify karein. Software settings tax advice nahi hain.</div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>08</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>08 · SaaS plans & billing</span></div>
+    <span class="eyebrow">Multi-restaurant subscription model</span>
+    <h2>Trial aur plans ka workflow</h2>
+    <p>Platform par har customer restaurant ka separate workspace aur subscription record hota hai. Signup par default 30-day trial create hota hai. Paid plans platform administrator manage/publish karta hai.</p>
+    <div class="flow"><span>Trial workspace</span><b>→</b><span>Plan choose</span><b>→</b><span>Razorpay subscription checkout</span><b>→</b><span>Verified payment</span><b>→</b><span>Active plan</span></div>
+    <h2>Plan mein kya configure ho sakta hai?</h2>
+    <ul>
+        <li>Plan name, description, monthly/yearly billing interval</li>
+        <li>Price aur supported platform currency (current configuration)</li>
+        <li>Razorpay recurring plan ID</li>
+        <li>Maximum branches, staff, products aur dining tables (blank means unlimited)</li>
+        <li>Website par dikhne wale plan features aur display order</li>
+    </ul>
+    <h2>Razorpay kis kaam ke liye hai?</h2>
+    <p>Razorpay RestaurantOS subscription checkout aur recurring billing ke liye use hota hai. Checkout tabhi start hoga jab deployment credentials configured hon aur Razorpay plan ka amount, currency aur interval published plan se match kare.</p>
+    <div class="grid-2">
+        <div class="card"><h3>Customer billing screen</h3><p>Restaurant owner current trial/subscription status, available plans aur recorded payment history dekhta hai; active subscription ki renewal cancel kar sakta hai.</p></div>
+        <div class="card"><h3>Cancellation</h3><p>Cancellation current billing period ke end par schedule hoti hai. Access period end tak rehna chahiye; gateway webhook subscription state update karta hai.</p></div>
+    </div>
+    <div class="callout"><strong>Expiry behavior:</strong> Trial/subscription expire hone par restaurant workspace aur public table QR orders block hote hain; owner billing page tak pahunchkar plan choose kar sakta hai.</div>
+    <div class="callout blue"><strong>Plan feature note:</strong> Branch/staff/product/table quantity limits enforce hote hain. Plan ke feature text website par display ke liye hai; har feature ke liye alag module-level on/off control is version mein abhi nahi hai.</div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>09</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>09 · Platform operations</span></div>
+    <span class="eyebrow">For the RestaurantOS operator</span>
+    <h2>Platform Admin ki responsibilities</h2>
+    <p>Platform Admin ek trusted operator role hai, restaurant owner role se alag. Is role ka use sirf SaaS operations aur customer onboarding support ke liye hona chahiye.</p>
+    <div class="grid-2">
+        <div class="card"><h3>Account operations</h3><ul><li>Restaurant organizations dekhna/manage karna.</li><li>Platform admin account securely create karna.</li><li>Restaurant users ko tenant admin ke through support dena.</li></ul></div>
+        <div class="card"><h3>Plan operations</h3><ul><li>Plan draft create/edit karna.</li><li>Razorpay par matching recurring plan banana.</li><li>Price/interval verify karke plan publish karna.</li></ul></div>
+        <div class="card"><h3>Billing operations</h3><ul><li>Deployment secrets set karna; code mein nahi.</li><li>Razorpay webhook endpoint configure karna.</li><li>Test-mode checkout, renewal, failures aur cancellation test karna.</li></ul></div>
+        <div class="card"><h3>Customer operations</h3><ul><li>Support contact aur escalation process dena.</li><li>Backups/restore procedures plan karna.</li><li>Privacy, terms, tax/refund policies business ke saath approve karna.</li></ul></div>
+    </div>
+    <h2>Business launch ke liye zaroori</h2>
+    <ul class="checklist">
+        <li>Domain + HTTPS, production database, production environment/debug off.</li>
+        <li>Reliable outbound email for password reset aur customer support contact.</li>
+        <li>Razorpay test-mode validation, published plan IDs and webhook secret.</li>
+        <li>Privacy policy, terms, cancellation/refund policy aur tax disclosures reviewed.</li>
+        <li>Database backup, access control, monitoring aur recovery plan.</li>
+        <li>Demo records ka review; demo account/sample data ko production customers se alag rakhein.</li>
+    </ul>
+    <div class="callout"><strong>Security:</strong> Admin password, APP_KEY, database credentials aur Razorpay API secrets sirf authorized deployment operator ke paas rahen. Client-facing PDF mein kabhi credentials na likhein.</div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>10</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>10 · Scope & transparency</span></div>
+    <span class="eyebrow">What is included today?</span>
+    <h2>Current capabilities vs. not included</h2>
+    <p>Client discussion mein current supported behavior aur future/custom scope ko alag rakhna important hai.</p>
+    <table>
+        <thead><tr><th>Available in current application</th><th>Not included as a working module in this release</th></tr></thead>
+        <tbody>
+            <tr><td>Responsive public pages, contact enquiry, registration, login, password reset</td><td>Native iOS/Android app, offline-first operation</td></tr>
+            <tr><td>Restaurant/branch setup, role-based user access</td><td>Automated payroll, staff attendance/shift scheduling</td></tr>
+            <tr><td>Menu categories/products, images, availability and table management</td><td>Ingredient-level stock, purchase orders, supplier management or stock deductions</td></tr>
+            <tr><td>Manual dine-in/takeaway/delivery order entry and status updates</td><td>Kitchen display/KOT printer integration, live kitchen notifications</td></tr>
+            <tr><td>Table QR menu, cart, dine-in order submission and receipt summary</td><td>Guest food-order online payment, refund processing, coupons/discounts</td></tr>
+            <tr><td>Order totals, configured tax/service/delivery fee, dashboard snapshots</td><td>Accounting integration, tax filing, advanced export/BI, profit reports</td></tr>
+            <tr><td>Razorpay-based RestaurantOS plan checkout and billing lifecycle (after gateway setup)</td><td>Delivery marketplace integrations, rider tracking, customer loyalty/CRM campaigns</td></tr>
+        </tbody>
+    </table>
+    <div class="callout blue"><strong>Scope clarification:</strong> Some marketing pages may describe broader restaurant-industry solutions. This table reflects implemented workflows verified in this application version. Any additional feature requires separate confirmation, delivery scope and acceptance testing.</div>
+    <h2>Important operating assumptions</h2>
+    <ul>
+        <li>Restaurant supplies accurate menu, product prices, branch details and tax/fee settings.</li>
+        <li>Staff verifies actual cash/card/UPI receipt before marking an order as paid.</li>
+        <li>Customer QR order is dine-in and pay-at-restaurant; no food checkout gateway flow.</li>
+        <li>Plan prices, taxes and commercial terms are set by the platform operator; no defaults are promised.</li>
+        <li>Application access requires internet and an active browser/device.</li>
+    </ul>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>11</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>12 · Demo guide</span></div>
+    <span class="eyebrow">A practical 10-minute client demo</span>
+    <h2>Suggested demonstration flow</h2>
+    <table>
+        <thead><tr><th>Time</th><th>Show</th><th>Explain</th></tr></thead>
+        <tbody>
+            <tr><td>1 min</td><td>Public website and signup</td><td>Restaurant gets its own workspace, first branch and trial.</td></tr>
+            <tr><td>1 min</td><td>Dashboard</td><td>Daily order, paid sales and setup counts scoped by user role.</td></tr>
+            <tr><td>2 min</td><td>Categories/products</td><td>Menu setup, image/price/availability controls.</td></tr>
+            <tr><td>1 min</td><td>Tables and QR detail</td><td>Each table receives a unique QR link; old link is invalidated on rotation.</td></tr>
+            <tr><td>2 min</td><td>Scan QR with phone</td><td>Guest selects items, sees quantities/cart and places table order.</td></tr>
+            <tr><td>1 min</td><td>Customer receipt</td><td>Order number, table, item breakdown and pay-at-restaurant status.</td></tr>
+            <tr><td>1 min</td><td>Admin orders</td><td>Team updates pending → preparing → ready → completed, then records payment.</td></tr>
+            <tr><td>1 min</td><td>Billing screen / plan admin</td><td>Trial/plan status, configurable limits and payment setup prerequisite.</td></tr>
+        </tbody>
+    </table>
+    <h2>Before a live demo</h2>
+    <ul class="checklist">
+        <li>Use a demo restaurant, clean menu and current demo account credentials.</li>
+        <li>Confirm APP_URL/domain and QR code point to the demo environment.</li>
+        <li>Test a QR order and capture its order number before the client joins.</li>
+        <li>Keep a phone connected to the same internet for QR scan demo.</li>
+        <li>Use Razorpay test mode only; never show real API secrets.</li>
+        <li>Explain the “not included” list before discussing custom additions.</li>
+    </ul>
+    <div class="callout"><strong>Demo narration:</strong> “Customer apne table ka QR scan karta hai, menu se items choose karta hai aur order submit karta hai. Staff ko order dashboard mein milta hai. Restaurant payment verify karke record karta hai; subscription billing alag Razorpay workflow hai.”</div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>12</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>13 · FAQs</span></div>
+    <span class="eyebrow">Common client questions · Part 1</span>
+    <h2>FAQs</h2>
+    <div class="card no-break"><h3>Q. Kya multiple restaurants is platform ko use kar sakte hain?</h3><p>Haan. SaaS structure mein har restaurant ka alag organization/workspace, user scope aur subscription record hota hai.</p></div>
+    <div class="card no-break space-top"><h3>Q. Customer QR scan karke order kare to payment kahan hoti hai?</h3><p>Customer order online submit karta hai, par is workflow mein payment restaurant par hoti hai. Staff Cash, Card ya UPI method se payment record karta hai.</p></div>
+    <div class="card no-break space-top"><h3>Q. Razorpay order payment ke liye hai?</h3><p>Nahi. Current Razorpay integration RestaurantOS software subscription billing ke liye hai; restaurant food order checkout ke liye nahi.</p></div>
+    <div class="card no-break space-top"><h3>Q. Table QR code kahan se milega?</h3><p>Admin dashboard → Dining Tables → required table detail. Wahan se print/download karein. QR rotate karne par purana code kaam nahi karega.</p></div>
+    <div class="card no-break space-top"><h3>Q. Trial ke baad kya hoga?</h3><p>Trial/active subscription access expire hone par workspace aur customer QR ordering block hote hain. Owner billing page par plan choose kar sakta hai. Live paid checkout ke liye Razorpay secrets, matching plan ID aur webhook configuration chahiye.</p></div>
+    <div class="card no-break space-top"><h3>Q. Kya subscription price pehle se fixed hai?</h3><p>Nahi. Platform Admin plan price aur limits configure karta hai. Commercial price tabhi dikhni/checkout honi chahiye jab plan publish ho aur Razorpay recurring plan matching ho.</p></div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>13</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>14 · FAQs</span></div>
+    <span class="eyebrow">Common client questions · Part 2</span>
+    <h2>More frequently asked questions</h2>
+    <div class="card no-break"><h3>Q. Kya software stock aur inventory track karta hai?</h3><p>Ingredient stock, purchase orders aur supplier management current working module mein included nahi hain. Iske liye alag scope confirm karna hoga.</p></div>
+    <div class="card no-break space-top"><h3>Q. Kya internet ke bina system chalega?</h3><p>Nahi. Yeh web application hai; restaurant dashboard aur customer QR order ke liye active internet chahiye.</p></div>
+    <div class="card no-break space-top"><h3>Q. Password reset email nahi aaya to?</h3><p>Production email/SMTP settings check karein, spam folder dekhein aur hosting administrator se mail delivery verify karayein.</p></div>
+    <div class="card no-break space-top"><h3>Q. Data backup aur support kaun handle karta hai?</h3><p>Hosting/service provider ke saath backup frequency, retention, recovery owner aur support response times ko written agreement mein confirm karein.</p></div>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>14</span></div>
+</section>
+
+<section class="page">
+    <div class="page-head"><span class="brand">RestaurantOS</span><span>15 · Handover & glossary</span></div>
+    <span class="eyebrow">A clear handover for your team</span>
+    <h2>Client handover checklist</h2>
+    <ul class="checklist">
+        <li>Client-approved production domain opens securely with HTTPS.</li>
+        <li>Owner account, correct restaurant name and first branch verified.</li>
+        <li>Staff roles and branch assignments reviewed by the owner.</li>
+        <li>Menu, prices, unavailable items, customer-facing text and images approved.</li>
+        <li>Tax/service/delivery settings approved by the business/accountant.</li>
+        <li>Each physical table receives the matching printed QR code.</li>
+        <li>QR sample order verified; staff knows order and payment recording workflow.</li>
+        <li>Plan price, cancellation/refund terms, support contact and privacy notice approved.</li>
+        <li>Backups, support owner and incident escalation path documented.</li>
+    </ul>
+    <h2>Glossary</h2>
+    <table>
+        <tbody>
+            <tr><th>Organization / Tenant</th><td>Ek restaurant business ka separate SaaS workspace.</td></tr>
+            <tr><th>Branch</th><td>Organization ke under ek restaurant outlet/location.</td></tr>
+            <tr><th>QR token</th><td>Table-specific, non-guessable link identifier; rotate karne se old link invalidate hota hai.</td></tr>
+            <tr><th>Plan limit</th><td>Plan ke under allowed maximum branches, staff, products ya tables.</td></tr>
+            <tr><th>Trial</th><td>Initial time-limited RestaurantOS subscription access.</td></tr>
+            <tr><th>Webhook</th><td>Razorpay ka signed server notification, jo subscription/payment lifecycle update karta hai.</td></tr>
+        </tbody>
+    </table>
+    <div class="cover-art" style="min-height:43mm;margin:7mm 0">
+        <h2 style="font-size:18pt">Ready for your next service.</h2>
+        <p>RestaurantOS keeps table orders and restaurant operations in one connected workspace.</p>
+    </div>
+    <p class="small muted"><strong>Document note:</strong> Yeh guide 31 October 2026 ko available application behavior ke hisab se banayi gayi hai. Final pricing, commercial agreement, hosting/SLA, privacy notice, tax treatment aur legal terms ko service provider aur client alag se approve karein.</p>
+    <div class="page-foot"><span>RestaurantOS · Client Guide</span><span>15</span></div>
+</section>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="580" viewBox="0 0 760 580" fill="none">
+  <defs>
+    <linearGradient id="wash" x1="65" y1="50" x2="710" y2="550" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF1E7"/>
+      <stop offset="1" stop-color="#F1F5F9"/>
+    </linearGradient>
+    <linearGradient id="apron" x1="368" y1="167" x2="477" y2="468" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FB923C"/>
+      <stop offset="1" stop-color="#EA580C"/>
+    </linearGradient>
+  </defs>
+  <rect x="20" y="20" width="720" height="540" rx="42" fill="url(#wash)"/>
+  <circle cx="590" cy="120" r="72" fill="#FED7AA" fill-opacity=".6"/>
+  <circle cx="150" cy="430" r="90" fill="#FDBA74" fill-opacity=".24"/>
+  <rect x="92" y="383" width="575" height="24" rx="12" fill="#9A5A36"/>
+  <rect x="129" y="407" width="18" height="105" rx="9" fill="#71432E"/>
+  <rect x="610" y="407" width="18" height="105" rx="9" fill="#71432E"/>
+  <rect x="163" y="295" width="205" height="93" rx="20" fill="#fff" stroke="#E2E8F0" stroke-width="3"/>
+  <rect x="185" y="315" width="52" height="52" rx="12" fill="#FFF1E7"/>
+  <path d="M200 328h23v26h-23zM205 333h13M205 338h13M205 343h8" stroke="#F97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="251" y="335" fill="#172033" font-family="Arial,sans-serif" font-size="14" font-weight="700">Order #1042</text>
+  <text x="251" y="357" fill="#64748B" font-family="Arial,sans-serif" font-size="11">Table 04 · Preparing</text>
+  <rect x="251" y="369" width="91" height="5" rx="2.5" fill="#DCFCE7"/>
+  <rect x="251" y="369" width="62" height="5" rx="2.5" fill="#22C55E"/>
+  <path d="M351 193c0-25 20-45 45-45s45 20 45 45v26h-90z" fill="#172033"/>
+  <circle cx="395" cy="212" r="45" fill="#D9956C"/>
+  <path d="M355 204c8-32 31-50 67-41 13 3 24 13 29 26-21-9-47-10-66-1-10 5-20 11-30 16Z" fill="#172033"/>
+  <path d="M340 270c14-20 31-30 55-30s43 10 57 30l37 179H305l35-179Z" fill="url(#apron)"/>
+  <path d="M368 251l27 34 27-34" stroke="#FFF7ED" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M394 284v120M365 352h58" stroke="#C2410C" stroke-width="5" stroke-linecap="round"/>
+  <rect x="374" y="335" width="42" height="36" rx="8" fill="#FFF7ED"/>
+  <path d="M385 345h20M385 352h20M385 359h13" stroke="#F97316" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M342 282 297 345l40 23 33-61M453 282l44 64-37 23-33-62" fill="#D9956C"/>
+  <path d="M302 345c-10-3-18 2-23 11l-11 20c-4 8 4 16 12 12l34-19 28-29-24-14-16 19Z" fill="#D9956C"/>
+  <path d="M490 348c10-4 18 2 23 10l12 20c4 8-4 16-12 12l-34-18-28-28 24-15 15 19Z" fill="#D9956C"/>
+  <rect x="465" y="335" width="51" height="37" rx="8" transform="rotate(-8 465 335)" fill="#fff"/>
+  <path d="m477 348 22-3M478 355l19-3M479 362l13-2" stroke="#F97316" stroke-width="2.5" stroke-linecap="round"/>
+  <ellipse cx="550" cy="344" rx="59" ry="15" fill="#F8FAFC"/>
+  <ellipse cx="550" cy="339" rx="51" ry="13" fill="#fff" stroke="#CBD5E1" stroke-width="2"/>
+  <circle cx="533" cy="337" r="10" fill="#22C55E"/>
+  <circle cx="555" cy="334" r="12" fill="#F97316"/>
+  <circle cx="573" cy="338" r="8" fill="#EAB308"/>
+  <path d="M548 328c3-9 10-10 14-9-1 7-6 10-14 9ZM530 327c-4-7-10-6-13-4 4 6 8 7 13 4Z" fill="#15803D"/>
+  <rect x="515" y="420" width="122" height="54" rx="15" fill="white"/>
+  <circle cx="538" cy="447" r="13" fill="#DCFCE7"/>
+  <path d="m532 447 4 4 8-9" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="559" y="444" fill="#172033" font-family="Arial,sans-serif" font-size="11" font-weight="700">Order served</text>
+  <text x="559" y="460" fill="#64748B" font-family="Arial,sans-serif" font-size="9">Table 04</text>
+  <rect x="96" y="189" width="127" height="63" rx="15" fill="white"/>
+  <circle cx="122" cy="220" r="16" fill="#FFF1E7"/>
+  <path d="M115 216h14v11h-14zM118 212h8v4" stroke="#F97316" stroke-width="2" stroke-linejoin="round"/>
+  <text x="147" y="217" fill="#172033" font-family="Arial,sans-serif" font-size="10" font-weight="700">Table QR</text>
+  <text x="147" y="233" fill="#64748B" font-family="Arial,sans-serif" font-size="9">Guest ordering</text>
+</svg>
