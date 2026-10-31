@@ -36,6 +36,42 @@ class StaffManagementTest extends TestCase
         $this->assertTrue(Hash::check('password12345', $user->password));
     }
 
+    public function test_admin_can_create_branch_scoped_kitchen_and_service_roles(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+        [$organization, $branch] = $this->createOrganizationWithBranch('OPS');
+
+        foreach (['waiter', 'captain', 'chef', 'kitchen_manager'] as $role) {
+            $this->post(route('admin.staff.store'), [
+                'name' => ucfirst($role),
+                'email' => "{$role}@example.com",
+                'role' => $role,
+                'organization_id' => $organization->id,
+                'branch_id' => $branch->id,
+                'password' => 'password12345',
+                'password_confirmation' => 'password12345',
+            ])->assertRedirect(route('admin.staff.index'));
+
+            $this->assertDatabaseHas('users', [
+                'email' => "{$role}@example.com",
+                'role' => $role,
+                'organization_id' => $organization->id,
+                'branch_id' => $branch->id,
+            ]);
+        }
+
+        $this->from(route('admin.staff.create'))
+            ->post(route('admin.staff.store'), [
+                'name' => 'Unassigned Chef',
+                'email' => 'unassigned@example.com',
+                'role' => 'chef',
+                'organization_id' => $organization->id,
+                'password' => 'password12345',
+                'password_confirmation' => 'password12345',
+            ])
+            ->assertSessionHasErrors('branch_id');
+    }
+
     public function test_staff_are_limited_to_read_only_access_for_their_assigned_branch(): void
     {
         [$organization, $branch] = $this->createOrganizationWithBranch('MAIN');

@@ -4,10 +4,12 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Branch;
 use App\Models\Category;
+use App\Models\CashRegisterSession;
 use App\Models\DiningTable;
 use App\Models\Order;
 use App\Models\Organization;
 use App\Models\OrganizationSetting;
+use App\Models\OrderPayment;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -90,6 +92,157 @@ class OrderManagementTest extends TestCase
         $order = Order::with('items')->firstOrFail();
         $this->assertSame('225.00', $order->total);
         $this->assertSame('75.00', $order->items->first()->unit_price);
+        $this->assertNotNull($order->invoice_number);
+        $this->assertDatabaseHas('order_payments', [
+            'order_id' => $order->id,
+            'transaction_type' => 'payment',
+            'payment_method' => 'upi',
+            'amount' => '225.00',
+        ]);
+    }
+
+    public function test_pos_applies_discount_before_tax_and_records_invoice(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+        [$branch, $product] = $this->createMenuAndTable('POSDISC');
+        OrganizationSetting::create([
+            'organization_id' => $branch->organization_id,
+            'tax_label' => 'GST',
+            'tax_rate' => 5,
+            'service_charge_rate' => 10,
+        ]);
+
+        $this->post(route('admin.orders.store'), [
+            'branch_id' => $branch->id,
+            'order_type' => 'takeaway',
+            'items' => [['product_id' => $product->id, 'quantity' => 2]],
+            'payment_status' => 'pending',
+            'discount_type' => 'percentage',
+            'discount_value' => 10,
+        ])->assertRedirect();
+
+        $order = Order::firstOrFail();
+        $this->assertSame('150.00', $order->subtotal);
+        $this->assertSame('15.00', $order->discount_amount);
+        $this->assertSame('6.75', $order->tax_amount);
+        $this->assertSame('13.50', $order->service_charge);
+        $this->assertSame('155.25', $order->total);
+        $this->assertNull($order->invoice_number);
+    }
+
+    public function test_pos_supports_split_partial_payment_and_refund_limits(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+        [$branch, $product] = $this->createMenuAndTable('POSSPLIT');
+        $this->post(route('admin.orders.store'), [
+            'branch_id' => $branch->id,
+            'order_type' => 'takeaway',
+            'items' => [['product_id' => $product->id, 'quantity' => 1]],
+            'payment_status' => 'pending',
+        ])->assertRedirect();
+        $order = Order::firstOrFail();
+
+        $this->postJson(route('admin.orders.payments.store', $order), [
+            'payments' => [['payment_method' => 'cash', 'amount' => 75.01]],
+        ])->assertUnprocessable()->assertJsonValidationErrors('payments');
+        $this->assertDatabaseCount('order_payments', 0);
+
+        $this->postJson(route('admin.orders.payments.store', $order), [
+            'payments' => [['payment_method' => 'cash', 'amount' => 25]],
+        ])->assertOk()->assertJsonPath('refresh', true);
+        $this->assertSame('partial', $order->fresh()->payment_status);
+        $this->assertNotNull($order->fresh()->invoice_number);
+
+        $this->postJson(route('admin.orders.payments.store', $order), [
+            'payments' => [
+                ['payment_method' => 'cash', 'amount' => 10],
+                ['payment_method' => 'upi', 'amount' => 40],
+            ],
+        ])->assertOk();
+        $this->assertSame('paid', $order->fresh()->payment_status);
+        $this->assertSame('multiple', $order->fresh()->payment_method);
+        $paidAt = $order->fresh()->paid_at;
+        $this->assertNotNull($paidAt);
+        $this->assertSame(3, OrderPayment::where('order_id', $order->id)->where('transaction_type', 'payment')->count());
+
+        $this->postJson(route('admin.orders.refund', $order), [
+            'payment_method' => 'upi',
+            'amount' => 20,
+            'notes' => 'Guest returned one item',
+        ])->assertOk()->assertJsonPath('refresh', true);
+        $this->assertSame('partially_refunded', $order->fresh()->payment_status);
+        $this->assertEquals($paidAt, $order->fresh()->paid_at);
+        $this->assertSame(0.0, (float) $order->fresh()->total - (float) OrderPayment::where('order_id', $order->id)
+            ->where('transaction_type', 'payment')->sum('amount'));
+
+        $this->postJson(route('admin.orders.refund', $order), [
+            'payment_method' => 'upi',
+            'amount' => 56,
+            'notes' => 'Over-refund attempt',
+        ])->assertUnprocessable()->assertJsonValidationErrors('amount');
+
+        $this->assertSame(1, OrderPayment::where('order_id', $order->id)->where('transaction_type', 'refund')->count());
+        $this->get(route('admin.reports.index'))
+            ->assertOk()
+            ->assertViewHas('sales', fn ($sales) => $sales->contains(fn ($sale) => (float) $sale->total === 55.0));
+        $this->get(route('admin.dashboard'))->assertOk()->assertSee('INR 55.00');
+    }
+
+    public function test_pos_orders_can_be_held_and_resumed(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+        [$branch, $product] = $this->createMenuAndTable('POSHOLD');
+
+        $this->post(route('admin.orders.store'), [
+            'branch_id' => $branch->id,
+            'order_type' => 'takeaway',
+            'items' => [['product_id' => $product->id, 'quantity' => 1]],
+            'payment_status' => 'pending',
+            'hold_order' => 1,
+        ])->assertRedirect();
+        $order = Order::firstOrFail();
+        $this->assertSame('held', $order->status);
+
+        $this->patch(route('admin.orders.status', $order), ['status' => 'pending'])->assertRedirect();
+        $this->assertSame('pending', $order->fresh()->status);
+    }
+
+    public function test_cash_register_closing_reconciles_opening_float_and_cash_tenders(): void
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+        $this->actingAs($user);
+        [$branch, $product] = $this->createMenuAndTable('POSCASH');
+        $this->post(route('admin.cash-register.open'), [
+            'branch_id' => $branch->id,
+            'opening_float' => 100,
+        ])->assertRedirect();
+        $session = CashRegisterSession::firstOrFail();
+        $this->from(route('admin.cash-register.index', ['branch_id' => $branch->id]))
+            ->post(route('admin.cash-register.open'), [
+                'branch_id' => $branch->id,
+                'opening_float' => 100,
+            ])
+            ->assertSessionHasErrors('branch_id');
+        $this->assertDatabaseCount('cash_register_sessions', 1);
+
+        $this->post(route('admin.orders.store'), [
+            'branch_id' => $branch->id,
+            'order_type' => 'takeaway',
+            'items' => [['product_id' => $product->id, 'quantity' => 1]],
+            'payment_status' => 'paid',
+            'payment_method' => 'cash',
+        ])->assertRedirect();
+
+        $payment = OrderPayment::where('transaction_type', 'payment')->firstOrFail();
+        $this->assertSame($session->id, $payment->cash_register_session_id);
+
+        $this->patchJson(route('admin.cash-register.close', $session), [
+            'counted_cash' => 173,
+            'closing_notes' => 'Till counted',
+        ])->assertOk()->assertJsonPath('expected_cash', 175)->assertJsonPath('difference', -2);
+        $this->assertNotNull($session->fresh()->closed_at);
+        $this->assertSame('175.00', $session->fresh()->expected_cash);
+        $this->assertSame('-2.00', $session->fresh()->cash_difference);
     }
 
     public function test_order_snapshots_organization_tax_fees_and_currency(): void

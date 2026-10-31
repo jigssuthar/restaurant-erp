@@ -8,14 +8,15 @@
 
     <div class="sidebar-menu">
 
-        <div class="sidebar-heading">MAIN MENU</div>
-
-        <a href="{{ route('admin.dashboard') }}"
-           class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-            <i class="bi bi-grid"></i>
-            Dashboard
-        </a>
-
+        @if(auth()->user()->hasAnyRole('admin', 'manager', 'staff'))
+            <div class="sidebar-heading">MAIN MENU</div>
+            <a href="{{ route('admin.dashboard') }}"
+               class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <i class="bi bi-grid"></i>
+                Dashboard
+            </a>
+        @endif
+        @if(auth()->user()->hasAnyRole('admin', 'manager', 'staff'))
         <div class="sidebar-heading">BUSINESS MANAGEMENT</div>
 
         @if(auth()->user()->isPlatformAdmin())
@@ -73,6 +74,32 @@
             <i class="bi bi-receipt"></i>
             Orders
         </a>
+        <a href="{{ route('admin.cash-register.index') }}"
+           class="sidebar-link {{ request()->routeIs('admin.cash-register.*') ? 'active' : '' }}">
+            <i class="bi bi-cash-coin"></i>
+            Cash Register
+        </a>
+
+        @if(auth()->user()->hasAnyRole('admin', 'manager'))
+            <div class="sidebar-heading">OPERATIONS</div>
+            <a href="{{ route('admin.calendar.index') }}" class="sidebar-link {{ request()->routeIs('admin.calendar.*') ? 'active' : '' }}">
+                <i class="bi bi-calendar-event"></i> Calendar & Events
+            </a>
+            <a href="{{ route('admin.reservations.index') }}" class="sidebar-link {{ request()->routeIs('admin.reservations.*') ? 'active' : '' }}">
+                <i class="bi bi-journal-check"></i> Reservations
+            </a>
+            <a href="{{ route('admin.inventory.index') }}" class="sidebar-link {{ request()->routeIs('admin.inventory.*') ? 'active' : '' }}">
+                <i class="bi bi-box-seam"></i> Inventory
+            </a>
+            @if(!auth()->user()->isPlatformAdmin())
+                <a href="{{ route('admin.suppliers.index') }}" class="sidebar-link {{ request()->routeIs('admin.suppliers.*') || request()->routeIs('admin.purchase-orders.*') ? 'active' : '' }}">
+                    <i class="bi bi-truck"></i> Suppliers & Purchasing
+                </a>
+            @endif
+            <a href="{{ route('admin.reports.index') }}" class="sidebar-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+                <i class="bi bi-graph-up"></i> Advanced Reports
+            </a>
+        @endif
 
         <div class="sidebar-heading">SETTINGS</div>
 
@@ -90,6 +117,7 @@
                 <i class="bi bi-gear"></i>
                 Settings
             </a>
+        @endif
         @endif
 
         <form action="{{ route('admin.logout') }}" method="POST">

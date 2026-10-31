@@ -1,12 +1,12 @@
 @extends('layouts.admin')
 @section('title', 'New Order')
 @section('content')
-<div class="mb-4"><h3 class="fw-bold mb-1">New Order</h3><p class="text-muted mb-0">Order totals are calculated from current menu prices. Taxes and discounts are not configured.</p></div>
+<div class="mb-4"><h3 class="fw-bold mb-1">POS · New Order</h3><p class="text-muted mb-0">Server-priced billing with branch tax, service charge, and an optional authorized discount.</p></div>
 @if($branches->isEmpty())
     <div class="alert alert-warning">Your account is not assigned to a branch that can take orders. Ask an administrator to assign your account.</div>
 @endif
 <div class="admin-card">
-    <form action="{{ route('admin.orders.store') }}" method="POST" id="orderForm">
+    <form action="{{ route('admin.orders.store') }}" method="POST" id="orderForm" data-ajax-form>
         @csrf
         @if($errors->any())
             <div class="alert alert-danger"><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
@@ -66,6 +66,19 @@
                 </select>
                 @error('payment_method')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
+            <div class="col-md-3">
+                <label for="discount_type" class="form-label">Discount type</label>
+                <select id="discount_type" name="discount_type" class="form-select">
+                    <option value="">No discount</option>
+                    <option value="percentage" @selected(old('discount_type') === 'percentage')>Percentage</option>
+                    <option value="fixed" @selected(old('discount_type') === 'fixed')>Fixed amount</option>
+                </select>
+            </div>
+            <div class="col-md-3" id="discountValueField" hidden>
+                <label for="discount_value" class="form-label">Discount value</label>
+                <input id="discount_value" name="discount_value" type="number" min="0" step="0.01"
+                       value="{{ old('discount_value') }}" class="form-control">
+            </div>
             <div class="col-md-6">
                 <label for="customer_name" class="form-label">Customer name</label>
                 <input id="customer_name" name="customer_name" value="{{ old('customer_name') }}" maxlength="255" class="form-control @error('customer_name') is-invalid @enderror">
@@ -111,6 +124,7 @@
                     <div id="taxPreviewRow" hidden><span id="taxLabelPreview">Tax</span>: <span class="orderCurrencyCode">INR</span> <span id="taxPreview">0.00</span></div>
                     <div id="servicePreviewRow" hidden>Service charge: <span class="orderCurrencyCode">INR</span> <span id="servicePreview">0.00</span></div>
                     <div id="deliveryPreviewRow" hidden>Delivery fee: <span class="orderCurrencyCode">INR</span> <span id="deliveryPreview">0.00</span></div>
+                    <div id="discountPreviewRow" hidden>Discount: <span class="orderCurrencyCode">INR</span> <span id="discountPreview">0.00</span></div>
                     <div class="fw-bold fs-5">Total: <span class="orderCurrencyCode">INR</span> <span id="totalPreview">0.00</span></div>
                 </div>
                 <small class="text-muted d-block text-end">Price is recalculated securely on the server.</small>
@@ -123,6 +137,7 @@
         </div>
         <div class="d-flex gap-2 mt-4">
             <button type="submit" class="btn btn-orange" @disabled($branches->isEmpty() || $products->isEmpty())>Create Order</button>
+            <button type="submit" name="hold_order" value="1" class="btn btn-outline-warning" @disabled($branches->isEmpty() || $products->isEmpty() || old('payment_status') === 'paid')>Hold Order</button>
             <a href="{{ route('admin.orders.index') }}" class="btn btn-light border">Cancel</a>
         </div>
     </form>
@@ -135,6 +150,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const branchSelect = document.getElementById('branch_id');
     const typeSelect = document.getElementById('order_type');
     const paymentStatus = document.getElementById('payment_status');
+    const discountType = document.getElementById('discount_type');
+    const discountValue = document.getElementById('discount_value');
     const tableSelect = document.getElementById('dining_table_id');
     const customerName = document.getElementById('customer_name');
     const address = document.getElementById('delivery_address');
@@ -157,6 +174,8 @@ document.addEventListener('DOMContentLoaded', function () {
         customerName.required = delivery;
         document.getElementById('paymentMethodField').hidden = paymentStatus.value !== 'paid';
         document.getElementById('payment_method').required = paymentStatus.value === 'paid';
+        document.getElementById('discountValueField').hidden = !discountType.value;
+        discountValue.required = Boolean(discountType.value);
 
         document.querySelectorAll('.product-select option[data-branch-id], #dining_table_id option[data-branch-id]').forEach((option) => {
             option.hidden = option.dataset.branchId !== branchSelect.value;
@@ -177,19 +196,33 @@ document.addEventListener('DOMContentLoaded', function () {
         const taxRate = Number(branch?.dataset.taxRate || 0);
         const serviceRate = Number(branch?.dataset.serviceChargeRate || 0);
         const deliveryFee = typeSelect.value === 'delivery' ? Number(branch?.dataset.deliveryFee || 0) : 0;
-        const tax = Math.round(total * taxRate) / 100;
-        const service = Math.round(total * serviceRate) / 100;
+        const discountRateOrAmount = Number(discountValue.value || 0);
+        const discountAmount = discountType.value === 'percentage'
+            ? Math.round(total * Math.min(discountRateOrAmount, 100)) / 100
+            : Math.min(Math.round(discountRateOrAmount * 100) / 100, total);
+        const taxableSubtotal = Math.max(0, total - discountAmount);
+        const tax = Math.round(taxableSubtotal * taxRate) / 100;
+        const service = Math.round(taxableSubtotal * serviceRate) / 100;
         document.getElementById('subtotalPreview').textContent = total.toFixed(2);
         document.getElementById('taxLabelPreview').textContent =
             `${branch?.dataset.taxLabel || 'Tax'} (${taxRate.toFixed(2)}%)`;
         document.getElementById('taxPreview').textContent = tax.toFixed(2);
         document.getElementById('servicePreview').textContent = service.toFixed(2);
         document.getElementById('deliveryPreview').textContent = deliveryFee.toFixed(2);
-        document.getElementById('totalPreview').textContent = (total + tax + service + deliveryFee).toFixed(2);
+        document.getElementById('discountPreview').textContent = discountAmount.toFixed(2);
+        document.getElementById('discountPreviewRow').hidden = discountAmount <= 0;
+        document.getElementById('totalPreview').textContent = (taxableSubtotal + tax + service + deliveryFee).toFixed(2);
         document.getElementById('taxPreviewRow').hidden = tax <= 0;
         document.getElementById('servicePreviewRow').hidden = service <= 0;
         document.getElementById('deliveryPreviewRow').hidden = deliveryFee <= 0;
     };
+
+    document.getElementById('orderForm').addEventListener('submit', (event) => {
+        if (event.submitter?.name === 'hold_order') {
+            paymentStatus.value = 'pending';
+            updateForm();
+        }
+    });
 
     document.getElementById('addOrderItem').addEventListener('click', () => {
         const row = rows.querySelector('.order-item-row').cloneNode(true);
@@ -214,6 +247,8 @@ document.addEventListener('DOMContentLoaded', function () {
     branchSelect.addEventListener('change', updateForm);
     typeSelect.addEventListener('change', updateForm);
     paymentStatus.addEventListener('change', updateForm);
+    discountType.addEventListener('change', updateForm);
+    discountValue.addEventListener('input', updateTotal);
     updateForm();
 });
 </script>

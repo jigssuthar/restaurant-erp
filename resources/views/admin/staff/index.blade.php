@@ -11,7 +11,7 @@
 @endif
 @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 <div class="admin-table-card">
-    <form method="GET" class="row g-3 mb-4">
+    <form method="GET" action="{{ route('admin.staff.index') }}" class="row g-3 mb-4" data-ajax-filter>
         <div class="col-lg-4 col-md-6"><input type="search" name="search" class="form-control" placeholder="Search name or email" value="{{ request('search') }}"></div>
         <div class="col-lg-3 col-md-6"><select name="role" class="form-select">
             <option value="">All roles</option>
@@ -42,7 +42,7 @@
                         <li><a class="dropdown-item" href="{{ route('admin.staff.edit', $account) }}">Edit</a></li>
                         @unless($account->is(auth()->user()))
                             <li><hr class="dropdown-divider"></li>
-                            <li><form action="{{ route('admin.staff.destroy', $account) }}" method="POST" onsubmit="return confirm('Delete this account?')">
+                            <li><form action="{{ route('admin.staff.destroy', $account) }}" method="POST" data-ajax-form onsubmit="return confirm('Delete this account?')">
                                 @csrf @method('DELETE')<button class="dropdown-item text-danger" type="submit">Delete</button></form></li>
                         @endunless
                     </ul>

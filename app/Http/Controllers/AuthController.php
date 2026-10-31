@@ -31,8 +31,21 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+            $user = $request->user();
+            $destination = match ($user->role) {
+                'waiter', 'captain' => route('service-app.index'),
+                'chef', 'kitchen_manager' => route('kitchen-display.index'),
+                default => route('admin.dashboard'),
+            };
 
-            return redirect()->intended(route('admin.dashboard'))
+            if ($user->hasAnyRole('waiter', 'captain', 'chef', 'kitchen_manager')) {
+                $request->session()->forget('url.intended');
+                $redirect = redirect()->to($destination);
+            } else {
+                $redirect = redirect()->intended($destination);
+            }
+
+            return $redirect
                 ->with('success', 'Welcome back!');
         }
 

@@ -8,7 +8,7 @@
     <p class="text-muted mb-0">Update branch information.</p>
 </div>
 <div class="admin-card">
-    <form action="{{ route('admin.branches.update', $branch) }}" method="POST">
+    <form action="{{ route('admin.branches.update', $branch) }}" method="POST" data-ajax-form>
         @csrf
         @method('PUT')
         @include('admin.branches.partials.form')

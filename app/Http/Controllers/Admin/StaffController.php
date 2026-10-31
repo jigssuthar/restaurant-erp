@@ -125,7 +125,9 @@ class StaffController extends Controller
                 ->when(! auth()->user()->isPlatformAdmin(), fn ($query) => $query->where('organization_id', auth()->user()->organization_id ?? 0))
                 ->orderBy('name')
                 ->get(),
-            'roles' => auth()->user()->isPlatformAdmin() ? User::ROLES : ['manager', 'staff'],
+            'roles' => auth()->user()->isPlatformAdmin()
+                ? User::ROLES
+                : ['manager', 'staff', 'waiter', 'captain', 'chef', 'kitchen_manager'],
         ];
     }
 
@@ -138,11 +140,15 @@ class StaffController extends Controller
         $isPlatformAdmin = $request->user()->isPlatformAdmin();
         $allowedRoles = $isPlatformAdmin
             ? User::ROLES
-            : ($staff?->is($request->user()) ? User::ROLES : ['manager', 'staff']);
+            : ($staff?->is($request->user())
+                ? User::ROLES
+                : ['manager', 'staff', 'waiter', 'captain', 'chef', 'kitchen_manager']);
+        $requiresBranch = \in_array($request->input('role'), ['staff', 'waiter', 'captain', 'chef', 'kitchen_manager'], true);
+        $requiresOrganization = $request->input('role') === 'manager' || $requiresBranch;
         $organizationRules = $isPlatformAdmin
             ? [
                 'nullable',
-                Rule::requiredIf(\in_array($request->input('role'), ['manager', 'staff'], true)),
+                Rule::requiredIf($requiresOrganization),
                 'integer',
                 'exists:organizations,id',
             ]
@@ -159,7 +165,7 @@ class StaffController extends Controller
             'organization_id' => $organizationRules,
             'branch_id' => [
                 'nullable',
-                Rule::requiredIf($request->input('role') === 'staff'),
+                Rule::requiredIf($requiresBranch),
                 'integer',
                 Rule::exists('branches', 'id')
                     ->where('organization_id', $isPlatformAdmin

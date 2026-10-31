@@ -1,7 +1,7 @@
 @extends('layouts.website')
 
-@section('title', 'RestaurantOS | Restaurant and Cafe Management')
-@section('description', 'Manage restaurant orders, tables, menus, staff, and branches from one responsive restaurant management platform.')
+@section('title', 'RestaurantOS | Restaurant Operations Platform')
+@section('description', 'Explore restaurant admin dashboards, POS billing, table QR ordering, Kitchen Display, waiter Service App, inventory, reservations, purchasing, and branch management.')
 
 @section('content')
 <section class="marketing-hero">
@@ -48,12 +48,72 @@
     </div>
 </section>
 
+<section class="section-space home-photo-section">
+    <div class="container">
+        <div class="section-intro text-center">
+            <span class="eyebrow">BUILT AROUND REAL SERVICE</span>
+            <h2 class="section-heading mt-3">From the dining room <span>to the kitchen.</span></h2>
+            <p class="section-description">See how menus, orders, tables, and team workflows connect across the places your guests experience.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <article class="photo-story-card h-100">
+                    <img src="{{ asset('images/restaurant-interior.jpg') }}" alt="Restaurant dining room prepared for guests" loading="lazy">
+                    <div class="photo-story-copy"><span>FRONT OF HOUSE</span><h3>Keep tables and orders in view</h3><p>Connect table details, guest QR orders, and staff-entered dine-in orders.</p></div>
+                </article>
+            </div>
+            <div class="col-md-4">
+                <article class="photo-story-card h-100">
+                    <img src="{{ asset('images/cafe-interior.jpg') }}" alt="Bright café counter and seating area" loading="lazy">
+                    <div class="photo-story-copy"><span>MENU & COUNTER</span><h3>Keep the menu ready to serve</h3><p>Organize categories and update product prices and availability for the team.</p></div>
+                </article>
+            </div>
+            <div class="col-md-4">
+                <article class="photo-story-card h-100">
+                    <img src="{{ asset('images/kitchen-team.jpg') }}" alt="Chef preparing a dish in a restaurant kitchen" loading="lazy">
+                    <div class="photo-story-copy"><span>ORDER WORKFLOW</span><h3>Follow each order’s progress</h3><p>Review item details and move orders through the available service statuses.</p></div>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-space module-gallery-section" id="modules">
+    <div class="container">
+        <div class="section-intro text-center">
+            <span class="eyebrow">ONE CONNECTED PLATFORM</span>
+            <h2 class="section-heading mt-3">Every team gets <span>the view they need.</span></h2>
+            <p class="section-description">Explore the admin dashboard, guest ordering, kitchen workflow, waiter service, and the tools that help run daily operations.</p>
+        </div>
+        <div class="row g-4">
+            @foreach($modules as $module)
+                <div class="col-sm-6 col-xl-4">
+                    <article class="module-card h-100">
+                        <a class="module-card-image" href="{{ route('features') }}#module-{{ $module['id'] }}" aria-label="View {{ $module['title'] }} details">
+                            <img src="{{ asset('images/'.$module['image']) }}" alt="{{ $module['image_alt'] }}" loading="lazy">
+                        </a>
+                        <div class="module-card-copy">
+                            <span class="module-card-icon"><i class="bi {{ $module['icon'] }}"></i></span>
+                            <h3>{{ $module['title'] }}</h3>
+                            <p>{{ $module['description'] }}</p>
+                            <a class="module-card-link" href="{{ route('features') }}#module-{{ $module['id'] }}">Explore module <i class="bi bi-arrow-right"></i></a>
+                        </div>
+                    </article>
+                </div>
+            @endforeach
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ route('features') }}" class="btn btn-outline-orange">See all platform features <i class="bi bi-arrow-right ms-2"></i></a>
+        </div>
+    </div>
+</section>
+
 <section class="section-space" id="features">
     <div class="container">
         <div class="section-intro text-center">
             <span class="eyebrow">EVERYTHING IN ONE PLACE</span>
-            <h2 class="section-heading mt-3">Less juggling. <span>Better service.</span></h2>
-            <p class="section-description">A connected set of tools for the work that happens before, during, and after every order.</p>
+            <h2 class="section-heading mt-3">Tools for <span>every restaurant team.</span></h2>
+            <p class="section-description">Give administrators, kitchen teams, waiters, and guests purpose-built ways to handle their part of service.</p>
         </div>
         <div class="row g-4 mt-2">
             @foreach($features as $feature)

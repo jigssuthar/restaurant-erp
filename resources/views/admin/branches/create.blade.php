@@ -8,7 +8,7 @@
     <p class="text-muted mb-0">Create a new location for an organization.</p>
 </div>
 <div class="admin-card">
-    <form action="{{ route('admin.branches.store') }}" method="POST">
+    <form action="{{ route('admin.branches.store') }}" method="POST" data-ajax-form>
         @csrf
         @include('admin.branches.partials.form')
     </form>

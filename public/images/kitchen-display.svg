@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="620" viewBox="0 0 900 620" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="70" y1="30" x2="820" y2="590" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF4E8"/>
+      <stop offset="1" stop-color="#EEF3F8"/>
+    </linearGradient>
+    <filter id="shadow" x="85" y="52" width="730" height="540" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+  <rect x="20" y="20" width="860" height="580" rx="38" fill="url(#bg)"/>
+  <ellipse cx="450" cy="535" rx="334" ry="25" fill="#172033" fill-opacity=".09" filter="url(#shadow)"/>
+  <rect x="93" y="76" width="714" height="454" rx="24" fill="#fff"/>
+  <path d="M117 76h666a24 24 0 0 1 24 24v54H93v-54a24 24 0 0 1 24-24Z" fill="#172033"/>
+  <circle cx="124" cy="111" r="6" fill="#FB923C"/>
+  <text x="150" y="118" fill="#fff" font-family="Arial,sans-serif" font-size="17" font-weight="700">Kitchen Display</text>
+  <rect x="642" y="96" width="136" height="30" rx="15" fill="#293449"/>
+  <circle cx="660" cy="111" r="5" fill="#22C55E"/>
+  <text x="673" y="115" fill="#E2E8F0" font-family="Arial,sans-serif" font-size="10">LIVE · Main Branch</text>
+  <g font-family="Arial,sans-serif">
+    <rect x="112" y="175" width="161" height="325" rx="14" fill="#F8FAFC"/>
+    <text x="128" y="201" fill="#172033" font-size="14" font-weight="700">New</text>
+    <rect x="235" y="185" width="23" height="22" rx="11" fill="#fff"/>
+    <text x="243" y="200" fill="#64748B" font-size="10">2</text>
+    <rect x="123" y="218" width="139" height="143" rx="11" fill="#fff" stroke="#E2E8F0"/>
+    <rect x="123" y="218" width="4" height="143" rx="2" fill="#F97316"/>
+    <text x="138" y="240" fill="#172033" font-size="11" font-weight="700">#ORD-1042</text>
+    <text x="138" y="257" fill="#64748B" font-size="9">TABLE 04 · 12:42 PM</text>
+    <path d="M138 270h109" stroke="#EEF2F6"/>
+    <text x="138" y="289" fill="#334155" font-size="10">Masala dosa</text>
+    <text x="238" y="289" fill="#334155" font-size="10" font-weight="700">× 2</text>
+    <text x="138" y="308" fill="#334155" font-size="10">Filter coffee</text>
+    <text x="238" y="308" fill="#334155" font-size="10" font-weight="700">× 1</text>
+    <rect x="137" y="324" width="110" height="25" rx="7" fill="#F97316"/>
+    <text x="158" y="340" fill="#fff" font-size="9" font-weight="700">START PREPARING</text>
+    <rect x="123" y="373" width="139" height="108" rx="11" fill="#fff" stroke="#E2E8F0"/>
+    <rect x="123" y="373" width="4" height="108" rx="2" fill="#F97316"/>
+    <text x="138" y="395" fill="#172033" font-size="11" font-weight="700">#ORD-1041</text>
+    <text x="138" y="412" fill="#64748B" font-size="9">TAKEAWAY · 12:38 PM</text>
+    <text x="138" y="437" fill="#334155" font-size="10">Paneer wrap</text>
+    <text x="238" y="437" fill="#334155" font-size="10" font-weight="700">× 1</text>
+    <rect x="138" y="449" width="108" height="20" rx="6" fill="#FFF1E7"/>
+    <text x="157" y="463" fill="#C2410C" font-size="9" font-weight="700">New ticket</text>
+    <rect x="286" y="175" width="182" height="325" rx="14" fill="#F8FAFC"/>
+    <text x="302" y="201" fill="#172033" font-size="14" font-weight="700">Preparing</text>
+    <rect x="426" y="185" width="23" height="22" rx="11" fill="#fff"/>
+    <text x="434" y="200" fill="#64748B" font-size="10">1</text>
+    <rect x="297" y="218" width="160" height="168" rx="11" fill="#fff" stroke="#E2E8F0"/>
+    <rect x="297" y="218" width="4" height="168" rx="2" fill="#3B82F6"/>
+    <text x="312" y="240" fill="#172033" font-size="11" font-weight="700">#ORD-1039</text>
+    <text x="312" y="257" fill="#64748B" font-size="9">TABLE 02 · 12:31 PM</text>
+    <path d="M312 270h130" stroke="#EEF2F6"/>
+    <text x="312" y="289" fill="#334155" font-size="10">Veg biryani</text>
+    <text x="426" y="289" fill="#334155" font-size="10" font-weight="700">× 2</text>
+    <text x="312" y="308" fill="#334155" font-size="10">Raita</text>
+    <text x="426" y="308" fill="#334155" font-size="10" font-weight="700">× 2</text>
+    <rect x="312" y="327" width="127" height="31" rx="7" fill="#EFF6FF"/>
+    <circle cx="325" cy="343" r="5" fill="#3B82F6"/>
+    <text x="337" y="346" fill="#1D4ED8" font-size="9" font-weight="700">In preparation</text>
+    <text x="312" y="374" fill="#94A3B8" font-size="8">Started 8 minutes ago</text>
+    <rect x="483" y="175" width="302" height="325" rx="14" fill="#F8FAFC"/>
+    <text x="499" y="201" fill="#172033" font-size="14" font-weight="700">Ready to serve</text>
+    <rect x="743" y="185" width="23" height="22" rx="11" fill="#fff"/>
+    <text x="751" y="200" fill="#64748B" font-size="10">1</text>
+    <rect x="494" y="218" width="280" height="142" rx="11" fill="#fff" stroke="#E2E8F0"/>
+    <rect x="494" y="218" width="4" height="142" rx="2" fill="#16A34A"/>
+    <text x="510" y="241" fill="#172033" font-size="11" font-weight="700">#ORD-1037</text>
+    <text x="510" y="258" fill="#64748B" font-size="9">TABLE 06 · 12:26 PM</text>
+    <path d="M510 271h248" stroke="#EEF2F6"/>
+    <text x="510" y="291" fill="#334155" font-size="10">Paneer tikka</text>
+    <text x="733" y="291" fill="#334155" font-size="10" font-weight="700">× 1</text>
+    <text x="510" y="310" fill="#334155" font-size="10">Butter naan</text>
+    <text x="733" y="310" fill="#334155" font-size="10" font-weight="700">× 2</text>
+    <rect x="510" y="326" width="248" height="22" rx="7" fill="#DCFCE7"/>
+    <circle cx="524" cy="337" r="5" fill="#16A34A"/>
+    <text x="537" y="340" fill="#15803D" font-size="9" font-weight="700">Ready · Notify service team</text>
+    <rect x="494" y="374" width="280" height="108" rx="11" fill="#fff" stroke="#E2E8F0"/>
+    <circle cx="521" cy="411" r="13" fill="#DCFCE7"/>
+    <path d="m515 411 4 4 8-9" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="544" y="407" fill="#172033" font-size="11" font-weight="700">Order served</text>
+    <text x="544" y="424" fill="#64748B" font-size="9">#ORD-1036 · TABLE 03</text>
+    <text x="510" y="461" fill="#94A3B8" font-size="9">Completed today</text>
+  </g>
+</svg>

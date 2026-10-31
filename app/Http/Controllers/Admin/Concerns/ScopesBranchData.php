@@ -20,7 +20,7 @@ trait ScopesBranchData
             return $query->where('organization_id', $user->organization_id ?? 0);
         }
 
-        if ($user->hasAnyRole('staff')) {
+        if ($user->hasAnyRole('staff', 'waiter', 'captain', 'chef', 'kitchen_manager')) {
             return $query->whereKey($user->branch_id ?? 0);
         }
 

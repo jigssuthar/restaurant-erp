@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable
 {
-    public const ROLES = ['admin', 'manager', 'staff'];
+    public const ROLES = ['admin', 'manager', 'staff', 'waiter', 'captain', 'chef', 'kitchen_manager'];
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;

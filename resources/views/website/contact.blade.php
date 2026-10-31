@@ -14,9 +14,10 @@
                 <p class="section-description fs-5 mt-3 mb-0">Tell us what you’re building. Our team will follow up about your restaurant management needs.</p>
             </div>
             <div class="col-lg-5">
-                <div class="inner-page-visual">
-                    <img src="{{ asset('images/restaurant-service.svg') }}" alt="Restaurant team serving a customer" fetchpriority="high">
-                </div>
+                <figure class="inner-page-visual inner-page-photo mb-0">
+                    <img src="{{ asset('images/restaurant-team.jpg') }}" alt="Two cooks preparing food together in a kitchen" fetchpriority="high">
+                    <figcaption>Tell us about your team, locations, and service workflow.</figcaption>
+                </figure>
             </div>
         </div>
     </div>
