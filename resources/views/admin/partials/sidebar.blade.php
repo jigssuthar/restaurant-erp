@@ -2,8 +2,8 @@
 <aside class="admin-sidebar" id="adminSidebar">
 
     <div class="sidebar-brand">
-        <i class="bi bi-shop me-2"></i>
-        RestaurantOS
+        <img class="brand-mark" src="{{ asset('images/dinecentral-mark.svg') }}" alt="">
+        <span>Dine<span>Central</span></span>
     </div>
 
     <div class="sidebar-menu">

@@ -1,7 +1,7 @@
 
 @extends('layouts.website')
 
-@section('title', 'Pricing Plans | RestaurantOS')
+@section('title', 'Pricing Plans | DineCentral')
 
 @section('content')
 
@@ -34,7 +34,7 @@
                 <div class="pricing-context-points">
                     <div><i class="bi bi-check-circle-fill"></i><span>Review the billing interval and listed features before subscribing.</span></div>
                     <div><i class="bi bi-check-circle-fill"></i><span>Trial length is shown at signup and may vary by platform settings.</span></div>
-                    <div><i class="bi bi-check-circle-fill"></i><span>RestaurantOS subscription billing is separate from customer food-order payments.</span></div>
+                    <div><i class="bi bi-check-circle-fill"></i><span>DineCentral subscription billing is separate from customer food-order payments.</span></div>
                 </div>
             </div>
         </div>

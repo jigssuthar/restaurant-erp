@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/dinecentral-mark.svg') }}">
 
-    <title>@yield('title') | RestaurantOS</title>
+    <title>@yield('title') | DineCentral</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
@@ -53,8 +54,8 @@
         <div class="w-100 d-flex flex-column align-items-center">
 
             <div class="mb-4 auth-logo">
-                <i class="bi bi-cup-hot-fill"></i>
-                RestaurantOS
+                <img class="brand-mark" src="{{ asset('images/dinecentral-mark.svg') }}" alt="">
+                <span>Dine<span>Central</span></span>
             </div>
 
             @if(session('success'))
@@ -72,7 +73,7 @@
             @yield('content')
 
             <p class="text-muted small mt-4">
-                © {{ date('Y') }} RestaurantOS. All rights reserved.
+                © {{ date('Y') }} DineCentral. All rights reserved.
             </p>
 
         </div>

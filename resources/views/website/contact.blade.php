@@ -1,7 +1,7 @@
 
 @extends('layouts.website')
 
-@section('title', 'Contact Us | RestaurantOS')
+@section('title', 'Contact Us | DineCentral')
 
 @section('content')
 

@@ -2,9 +2,9 @@
 <nav class="navbar navbar-expand-lg site-navbar sticky-top">
     <div class="container">
 
-        <a class="brand" href="{{ route('home') }}">
-            <i class="bi bi-cup-hot-fill text-orange"></i>
-            Restaurant<span>OS</span>
+        <a class="brand" href="{{ route('home') }}" aria-label="DineCentral home">
+            <img class="brand-mark" src="{{ asset('images/dinecentral-mark.svg') }}" alt="">
+            <span class="brand-name">Dine<span>Central</span></span>
         </a>
 
        <button class="navbar-toggler"

@@ -57,14 +57,63 @@ a {
 }
 
 .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
     font-size: 25px;
     font-weight: 800;
     color: var(--dark);
     white-space: nowrap;
+    text-decoration: none;
 }
 
-.brand span {
+.brand .brand-name {
+    color: inherit;
+}
+
+.brand .brand-name span {
     color: var(--primary);
+}
+
+.brand-mark {
+    display: block;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+}
+
+.sidebar-brand .brand-mark {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+}
+
+.auth-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.auth-logo > span {
+    color: #172033;
+}
+
+.auth-logo > span span {
+    color: #f97316;
+}
+
+.operations-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.operations-brand > span {
+    color: inherit;
+}
+
+.operations-brand > span span {
+    color: #f97316;
 }
 
 .site-navbar .nav-link {

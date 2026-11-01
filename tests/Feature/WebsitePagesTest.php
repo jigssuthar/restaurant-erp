@@ -14,6 +14,8 @@ class WebsitePagesTest extends TestCase
     {
         $this->get(route('home'))
             ->assertOk()
+            ->assertSee('DineCentral')
+            ->assertSee(asset('images/dinecentral-mark.svg'), false)
             ->assertSee('Fast POS billing')
             ->assertSee('Restaurants')
             ->assertSee(asset('images/restaurant-dashboard.svg'), false)
@@ -28,6 +30,8 @@ class WebsitePagesTest extends TestCase
             ->assertSee(asset('images/kitchen-display.svg'), false)
             ->assertSee(asset('images/service-app.svg'), false)
             ->assertSee(asset('images/qr-ordering.svg'), false);
+
+        $this->assertFileExists(public_path('images/dinecentral-mark.svg'));
     }
 
     public function test_authenticated_user_sees_dashboard_link_instead_of_login_and_registration(): void
@@ -97,6 +101,7 @@ class WebsitePagesTest extends TestCase
     {
         $response = $this->get(route('features'))
             ->assertOk()
+            ->assertSee('<title>Features | DineCentral</title>', false)
             ->assertSee('Admin Dashboard')
             ->assertSee('POS & Billing')
             ->assertSee('Table QR Ordering')

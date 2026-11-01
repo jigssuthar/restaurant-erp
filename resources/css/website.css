@@ -11,10 +11,21 @@
 }
 
 .site-navbar .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
     color: #172033;
     font-size: 23px;
     font-weight: 800;
     letter-spacing: -.7px;
+    text-decoration: none;
+}
+
+.brand-mark {
+    display: block;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
 }
 
 .site-navbar .navbar-nav {
@@ -842,7 +853,11 @@
     background: #121b2c;
 }
 
-.site-footer .brand span {
+.site-footer .brand .brand-name {
+    color: inherit;
+}
+
+.site-footer .brand .brand-name span {
     color: #fb923c;
 }
 

@@ -1,6 +1,6 @@
 @extends('layouts.website')
 
-@section('title', 'RestaurantOS | Restaurant Operations Platform')
+@section('title', 'DineCentral | Restaurant Operations Platform')
 @section('description', 'Explore restaurant admin dashboards, POS billing, table QR ordering, Kitchen Display, waiter Service App, inventory, reservations, purchasing, and branch management.')
 
 @section('content')
@@ -22,7 +22,7 @@
             </div>
             <div class="col-lg-6">
                 <div class="hero-art-wrap">
-                    <img src="{{ asset('images/restaurant-dashboard.svg') }}" alt="RestaurantOS dashboard illustration showing restaurant orders and sales" class="hero-art">
+                    <img src="{{ asset('images/restaurant-dashboard.svg') }}" alt="DineCentral dashboard illustration showing restaurant orders and sales" class="hero-art">
                     <div class="hero-float-card">
                         <span class="hero-float-icon"><i class="bi bi-qr-code-scan"></i></span>
                         <span><strong>Table QR ordering</strong><small>Orders sent to the right table</small></span>
@@ -148,7 +148,7 @@
                     <div><i class="bi bi-check2"></i><span><strong>Keep tables organized</strong><small>Manage seating and table-linked guest orders.</small></span></div>
                     <div><i class="bi bi-check2"></i><span><strong>Grow branch by branch</strong><small>Keep teams and operations in the right scope.</small></span></div>
                 </div>
-                <a href="{{ route('about') }}" class="btn btn-orange mt-4">Discover RestaurantOS <i class="bi bi-arrow-right ms-2"></i></a>
+                <a href="{{ route('about') }}" class="btn btn-orange mt-4">Discover DineCentral <i class="bi bi-arrow-right ms-2"></i></a>
             </div>
         </div>
     </div>

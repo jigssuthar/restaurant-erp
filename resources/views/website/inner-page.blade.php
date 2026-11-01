@@ -1,6 +1,6 @@
 @extends('layouts.website')
 
-@section('title', $page['title'].' | RestaurantOS')
+@section('title', $page['title'].' | DineCentral')
 @section('description', $page['description'])
 
 @section('content')

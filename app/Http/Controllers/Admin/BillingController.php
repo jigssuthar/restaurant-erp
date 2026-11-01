@@ -132,7 +132,7 @@ class BillingController extends Controller
             'subscription' => $subscription,
             'razorpayKey' => $key,
             'organization' => $organization,
-            'checkoutName' => config('app.name', 'RestaurantOS'),
+            'checkoutName' => config('app.name', 'DineCentral'),
             'owner' => $request->user(),
         ]);
     }

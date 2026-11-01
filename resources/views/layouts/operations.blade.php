@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Restaurant Operations') | RestaurantOS</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/dinecentral-mark.svg') }}">
+    <title>@yield('title', 'Restaurant Operations') | DineCentral</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
@@ -11,8 +12,9 @@
     <header class="bg-white border-bottom">
         <div class="container-fluid px-3 px-lg-4 py-3 d-flex align-items-center justify-content-between gap-3">
             <a href="{{ request()->routeIs('kitchen-display.*') ? route('kitchen-display.index') : route('service-app.index') }}"
-               class="text-decoration-none fw-bold text-dark fs-5">
-                <i class="bi bi-shop text-warning me-2"></i>RestaurantOS
+               class="operations-brand text-decoration-none fw-bold text-dark fs-5">
+                <img class="brand-mark" src="{{ asset('images/dinecentral-mark.svg') }}" alt="">
+                <span>Dine<span>Central</span></span>
             </a>
             <div class="d-flex align-items-center gap-3">
                 <span class="text-secondary small d-none d-sm-inline">{{ auth()->user()->name }}</span>

@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/dinecentral-mark.svg') }}">
 
-    <title>@yield('title', 'RestaurantOS') - Restaurant ERP</title>
+    <title>@yield('title', 'DineCentral') - Restaurant ERP</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -31,6 +32,9 @@
         }
 
         .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 9px;
             padding: 23px 20px;
             color: #fff;
             font-size: 21px;

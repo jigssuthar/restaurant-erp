@@ -6,7 +6,7 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
     <div>
         <h3 class="fw-bold mb-1">Dashboard Overview</h3>
-        <p class="text-muted mb-0">RestaurantOS management overview.</p>
+        <p class="text-muted mb-0">DineCentral management overview.</p>
     </div>
     <div class="text-muted small">{{ now()->format('d M Y') }}</div>
 </div>

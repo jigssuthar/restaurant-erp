@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-4">
     <h1 class="h3 mb-1">Billing & Plans</h1>
-    <p class="text-muted mb-0">Manage your RestaurantOS trial, subscription, and payment history.</p>
+    <p class="text-muted mb-0">Manage your DineCentral trial, subscription, and payment history.</p>
 </div>
 
 @if(session('success')) <div class="alert alert-success">{{ session('success') }}</div> @endif

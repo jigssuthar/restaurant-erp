@@ -6,9 +6,9 @@
 
             <div class="col-lg-4">
 
-                <a class="brand text-white" href="{{ route('home') }}">
-                    <i class="bi bi-cup-hot-fill text-warning"></i>
-                    Restaurant<span>OS</span>
+                <a class="brand text-white" href="{{ route('home') }}" aria-label="DineCentral home">
+                    <img class="brand-mark" src="{{ asset('images/dinecentral-mark.svg') }}" alt="">
+                    <span class="brand-name">Dine<span>Central</span></span>
                 </a>
 
                 <p class="text-white-50 mt-3">
@@ -59,7 +59,7 @@
         <hr class="border-secondary my-4">
 
         <div class="footer-bottom d-flex justify-content-between flex-wrap gap-2 pt-4">
-            <small>© {{ date('Y') }} RestaurantOS. All rights reserved.</small>
+            <small>© {{ date('Y') }} DineCentral. All rights reserved.</small>
             <small>Restaurant & Café Management Platform</small>
         </div>
 

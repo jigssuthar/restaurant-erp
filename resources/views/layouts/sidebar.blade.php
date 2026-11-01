@@ -2,8 +2,8 @@
 <aside class="sidebar">
 
     <div class="sidebar-brand">
-        <i class="bi bi-cup-hot-fill text-warning"></i>
-        Restaurant<span class="text-warning">OS</span>
+        <img class="brand-mark" src="{{ asset('images/dinecentral-mark.svg') }}" alt="">
+        <span>Dine<span class="text-warning">Central</span></span>
     </div>
 
     <div class="sidebar-menu">
@@ -94,7 +94,7 @@
     <div class="position-absolute bottom-0 w-100 p-3 border-top border-secondary">
         <div class="text-white small">
             <i class="bi bi-shield-check text-success"></i>
-            RestaurantOS v1.0
+            DineCentral v1.0
         </div>
     </div>
 
