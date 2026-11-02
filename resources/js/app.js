@@ -1,6 +1,225 @@
 import './bootstrap';
 import './operations-board';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { getApp, getApps, initializeApp } from '@firebase/app';
+import { getMessaging, getToken, isSupported, onMessage } from '@firebase/messaging';
+
+const firebasePushControl = document.querySelector('[data-firebase-push]');
+
+if (firebasePushControl) {
+    const config = JSON.parse(firebasePushControl.dataset.config);
+    const status = firebasePushControl.querySelector('[data-firebase-push-status]');
+    const savedTokenKey = 'firebase_push_device_token';
+    let messaging;
+    let foregroundListenerAttached = false;
+    let registrationInProgress = false;
+    const configReady = ['apiKey', 'authDomain', 'projectId', 'messagingSenderId', 'appId', 'vapidKey']
+        .every((key) => typeof config[key] === 'string' && config[key] !== '');
+
+    function listenForForegroundMessages(currentMessaging) {
+        if (foregroundListenerAttached) return;
+        onMessage(currentMessaging, (payload) => {
+            window.dispatchEvent(new Event('firebase-push-received'));
+            if (!payload.notification || Notification.permission !== 'granted') return;
+            const notification = new Notification(payload.notification.title || 'DineCentral', {
+                body: payload.notification.body || '',
+                icon: '/favicon.ico',
+                data: { url: payload.data?.click_url },
+            });
+            notification.onclick = () => {
+                window.focus();
+                if (notification.data.url) window.location.assign(notification.data.url);
+            };
+        });
+        foregroundListenerAttached = true;
+    }
+
+    async function registerForPush(permissionPromise = Promise.resolve(Notification.permission)) {
+        if (registrationInProgress) return;
+        registrationInProgress = true;
+        try {
+            if (!configReady) throw new Error('Firebase web push is not configured.');
+            if (!window.isSecureContext) {
+                throw new Error('Push notifications require HTTPS (localhost is supported for development).');
+            }
+
+            const permission = await permissionPromise;
+            if (permission !== 'granted') {
+                if (permission === 'denied') {
+                    status.textContent = 'Notifications are blocked in browser settings.';
+                }
+                return;
+            }
+
+            if (!('serviceWorker' in navigator) || !await isSupported()) {
+                throw new Error('Push notifications are not supported by this browser.');
+            }
+
+            const app = getApps().length ? getApp() : initializeApp(config);
+            messaging = getMessaging(app);
+            const serviceWorkerRegistration = await navigator.serviceWorker.register(firebasePushControl.dataset.workerUrl);
+            const token = await getToken(messaging, {
+                vapidKey: config.vapidKey,
+                serviceWorkerRegistration,
+            });
+            if (!token) throw new Error('Firebase did not return a browser registration token.');
+
+            await saveFirebaseDevice(token, 'POST');
+            localStorage.setItem(savedTokenKey, token);
+            listenForForegroundMessages(messaging);
+        } catch (error) {
+            status.textContent = error.message || 'Could not enable push notifications.';
+        } finally {
+            registrationInProgress = false;
+        }
+    }
+
+    if (!('Notification' in window)) {
+        status.textContent = 'Push notifications are not supported by this browser.';
+    } else if (Notification.permission === 'granted') {
+        void registerForPush();
+    } else if (Notification.permission === 'default') {
+        const requestPermissionOnInteraction = (event) => {
+            if (event.target.closest('form[action$="/logout"]')) return;
+            document.removeEventListener('click', requestPermissionOnInteraction);
+            void registerForPush(Notification.requestPermission());
+        };
+        document.addEventListener('click', requestPermissionOnInteraction);
+    } else {
+        status.textContent = 'Notifications are blocked in browser settings.';
+    }
+
+    const savedToken = localStorage.getItem(savedTokenKey);
+    if (savedToken) {
+        document.querySelectorAll('form[action$="/logout"]').forEach((form) => {
+            const tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = 'firebase_device_token';
+            tokenInput.value = savedToken;
+            form.append(tokenInput);
+        });
+    }
+
+    async function saveFirebaseDevice(token, method) {
+        const response = await fetch(firebasePushControl.dataset.registerUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': firebasePushControl.dataset.csrfToken,
+            },
+            body: JSON.stringify({ token }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Could not save push notification settings.');
+    }
+}
+
+document.querySelectorAll('[data-in-app-notifications]').forEach((menu) => {
+    const list = menu.querySelector('[data-notifications-list]');
+    const count = menu.querySelector('[data-notification-count]');
+    const status = menu.querySelector('[data-notifications-status]');
+    const readAllButton = menu.querySelector('[data-notifications-read-all]');
+    let requestInProgress = false;
+
+    async function loadNotifications() {
+        if (requestInProgress || document.hidden) return;
+        requestInProgress = true;
+        try {
+            const response = await fetch(menu.dataset.feedUrl, {
+                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Notifications could not be loaded.');
+
+            count.textContent = result.unread_count > 99 ? '99+' : String(result.unread_count);
+            count.classList.toggle('d-none', result.unread_count === 0);
+            readAllButton.hidden = result.unread_count === 0;
+            list.replaceChildren();
+
+            if (!result.notifications.length) {
+                status.textContent = 'No notifications yet.';
+                list.append(status);
+                return;
+            }
+
+            result.notifications.forEach((notification) => {
+                const link = document.createElement('a');
+                link.className = `list-group-item list-group-item-action${notification.read ? '' : ' bg-light'}`;
+                link.href = notification.url;
+                link.dataset.notificationId = notification.id;
+
+                const title = document.createElement('div');
+                title.className = 'fw-semibold small';
+                title.textContent = notification.title;
+                const body = document.createElement('div');
+                body.className = 'small text-body-secondary text-wrap';
+                body.textContent = notification.body;
+                const time = document.createElement('div');
+                time.className = 'small text-body-tertiary mt-1';
+                time.textContent = notification.created_at || '';
+
+                link.append(title, body, time);
+                list.append(link);
+            });
+        } catch (error) {
+            status.textContent = error.message || 'Notifications could not be loaded.';
+            list.replaceChildren(status);
+        } finally {
+            requestInProgress = false;
+        }
+    }
+
+    menu.addEventListener('show.bs.dropdown', loadNotifications);
+    menu.querySelector('[data-bs-toggle="dropdown"]').addEventListener('click', loadNotifications);
+    window.addEventListener('firebase-push-received', loadNotifications);
+    list.addEventListener('click', async (event) => {
+        const link = event.target.closest('[data-notification-id]');
+        if (!link || link.origin !== window.location.origin) return;
+        event.preventDefault();
+        try {
+            const response = await fetch(`${menu.dataset.feedUrl}/${encodeURIComponent(link.dataset.notificationId)}/read`, {
+                method: 'PATCH',
+                headers: {
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': menu.dataset.csrfToken,
+                },
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Notification could not be marked as read.');
+            window.location.assign(link.href);
+        } catch (error) {
+            status.textContent = error.message || 'Notification could not be opened.';
+        }
+    });
+
+    readAllButton.addEventListener('click', async () => {
+        readAllButton.disabled = true;
+        try {
+            const response = await fetch(menu.dataset.readAllUrl, {
+                method: 'PATCH',
+                headers: {
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': menu.dataset.csrfToken,
+                },
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Notifications could not be marked as read.');
+            await loadNotifications();
+        } catch (error) {
+            status.textContent = error.message || 'Notifications could not be marked as read.';
+        } finally {
+            readAllButton.disabled = false;
+        }
+    });
+
+    void loadNotifications();
+    window.setInterval(loadNotifications, 5000);
+    window.addEventListener('focus', loadNotifications);
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) loadNotifications();
+    });
+});
 
 if (document.querySelector('[data-qr-code]')) {
     import('qrcode').then(({ default: QRCode }) => {

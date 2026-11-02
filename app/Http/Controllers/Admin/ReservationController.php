@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\DiningTable;
 use App\Models\Reservation;
+use App\Services\FirebasePush;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -85,6 +86,15 @@ class ReservationController extends Controller
             ]);
         });
 
+        app(FirebasePush::class)->notifyBranch(
+            $reservation->branch_id,
+            ['admin', 'manager'],
+            'New reservation',
+            "{$reservation->reservation_number} · {$reservation->party_size} guests.",
+            route('admin.reservations.index', ['branch_id' => $reservation->branch_id]),
+            $request->user()->id,
+        );
+
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Reservation created.', 'redirect' => route('admin.reservations.index')], 201);
         }
@@ -96,7 +106,7 @@ class ReservationController extends Controller
     {
         $this->ensureBranchAccess($reservation->branch);
         $data = $request->validate(['status' => ['required', Rule::in(Reservation::STATUSES)]]);
-        DB::transaction(function () use ($reservation, $data) {
+        $statusChanged = DB::transaction(function () use ($reservation, $data) {
             $locked = Reservation::whereKey($reservation->id)->lockForUpdate()->firstOrFail();
             $allowed = [
                 'confirmed' => ['seated', 'cancelled', 'no_show'],
@@ -106,13 +116,26 @@ class ReservationController extends Controller
                 'no_show' => [],
             ];
             if ($data['status'] === $locked->status) {
-                return;
+                return false;
             }
             if (! in_array($data['status'], $allowed[$locked->status] ?? [], true)) {
                 throw ValidationException::withMessages(['status' => 'That reservation status transition is not allowed.']);
             }
             $locked->update(['status' => $data['status']]);
+
+            return true;
         });
+
+        if ($statusChanged) {
+            app(FirebasePush::class)->notifyBranch(
+                $reservation->branch_id,
+                ['admin', 'manager'],
+                'Reservation updated',
+                "{$reservation->reservation_number} is now {$data['status']}.",
+                route('admin.reservations.index', ['branch_id' => $reservation->branch_id]),
+                $request->user()->id,
+            );
+        }
 
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Reservation status updated.', 'refresh' => true]);

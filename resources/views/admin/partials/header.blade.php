@@ -20,11 +20,8 @@
 
     <div class="d-flex align-items-center gap-3">
 
-        <button class="btn btn-light rounded-circle"
-                type="button"
-                aria-label="Notifications">
-            <i class="bi bi-bell"></i>
-        </button>
+        @include('layouts.partials.notifications-bell')
+        @include('layouts.partials.firebase-push')
 
         <div class="dropdown">
 

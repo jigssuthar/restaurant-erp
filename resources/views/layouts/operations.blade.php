@@ -17,6 +17,8 @@
                 <span>Dine<span>Central</span></span>
             </a>
             <div class="d-flex align-items-center gap-3">
+                @include('layouts.partials.notifications-bell')
+                @include('layouts.partials.firebase-push')
                 <span class="text-secondary small d-none d-sm-inline">{{ auth()->user()->name }}</span>
                 <form action="{{ route('admin.logout') }}" method="POST" class="m-0">
                     @csrf

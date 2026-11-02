@@ -1,17 +1,18 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Branch;
 use App\Models\Organization;
 use App\Models\OrganizationSetting;
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
-use Illuminate\Auth\Events\PasswordReset;
 
 class AuthController extends Controller
 {
@@ -187,6 +188,11 @@ class AuthController extends Controller
     // Logout
     public function logout(Request $request)
     {
+        $deviceToken = $request->input('firebase_device_token');
+        if (is_string($deviceToken) && $deviceToken !== '') {
+            $request->user()?->firebaseDevices()->where('token', $deviceToken)->delete();
+        }
+
         Auth::logout();
 
         $request->session()->invalidate();

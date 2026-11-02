@@ -10,6 +10,7 @@ use App\Models\OrderPayment;
 use App\Models\OrganizationSetting;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\FirebasePush;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -26,7 +27,7 @@ class CreateRestaurantOrder
         array $details = [],
         bool $allowOccupiedTable = false,
     ): Order {
-        return DB::transaction(function () use ($branch, $items, $orderType, $diningTable, $user, $details, $allowOccupiedTable) {
+        $order = DB::transaction(function () use ($branch, $items, $orderType, $diningTable, $user, $details, $allowOccupiedTable) {
             $products = $this->availableProducts($branch, $items);
             $table = $diningTable
                 ? DiningTable::whereKey($diningTable->getKey())->lockForUpdate()->firstOrFail()
@@ -141,6 +142,19 @@ class CreateRestaurantOrder
 
             return $order;
         });
+
+        if ($order->status === 'pending') {
+            app(FirebasePush::class)->notifyBranch(
+                $branch->id,
+                ['admin', 'manager', 'staff', 'waiter', 'captain', 'chef', 'kitchen_manager'],
+                'New order received',
+                "Order {$order->order_number} is waiting for preparation.",
+                route('kitchen-display.index', ['branch_id' => $branch->id]),
+                $user?->id,
+            );
+        }
+
+        return $order;
     }
 
     private function availableProducts(Branch $branch, array $items): Collection

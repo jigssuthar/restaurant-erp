@@ -1,9 +1,10 @@
 
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WebsiteController;
+use App\Models\SaasPlan;
+use Illuminate\Support\Facades\Route;
 
 // PUBLIC WEBSITE
 Route::get('/', [WebsiteController::class, 'home'])
@@ -49,7 +50,7 @@ Route::get('/products/multi-branch', [WebsiteController::class, 'page'])
 
 // OTHER PAGES
 Route::get('/pricing', function () {
-    $plans = \App\Models\SaasPlan::query()
+    $plans = SaasPlan::query()
         ->where('is_active', true)
         ->whereNotNull('price')
         ->whereNotNull('razorpay_plan_id')
@@ -75,7 +76,6 @@ Route::get('/privacy-policy', [WebsiteController::class, 'page'])
 Route::get('/terms-and-conditions', [WebsiteController::class, 'page'])
     ->defaults('slug', 'terms')
     ->name('terms');
-
 
 // AUTHENTICATION
 Route::middleware('guest')->group(function () {
@@ -107,28 +107,52 @@ Route::middleware('guest')->group(function () {
         ->name('password.update');
 });
 
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\OrganizationController;
-use App\Http\Controllers\Admin\BranchController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\DiningTableController;
-use App\Http\Controllers\Admin\StaffController;
-use App\Http\Controllers\Admin\OrderController;
-use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Admin\SaasPlanController;
 use App\Http\Controllers\Admin\BillingController;
+use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\CalendarController;
 use App\Http\Controllers\Admin\CashRegisterController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DiningTableController;
 use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Admin\KitchenDisplayController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\OrganizationController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PurchaseOrderController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ReservationController;
+use App\Http\Controllers\Admin\SaasPlanController;
+use App\Http\Controllers\Admin\ServiceAppController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\CustomerTableOrderController;
 use App\Http\Controllers\CustomerTableServiceRequestController;
-use App\Http\Controllers\Admin\KitchenDisplayController;
-use App\Http\Controllers\Admin\ServiceAppController;
+use App\Http\Controllers\FirebaseDeviceController;
+use App\Http\Controllers\NotificationController;
+
+Route::get('/firebase-messaging-sw.js', function () {
+    return response()
+        ->view('firebase.messaging-sw', ['firebaseConfig' => config('services.firebase.web')])
+        ->header('Content-Type', 'application/javascript; charset=UTF-8')
+        ->header('Service-Worker-Allowed', '/');
+})->name('firebase.messaging-sw');
+
+Route::middleware('auth')->prefix('notifications/firebase')->name('notifications.firebase.')->group(function () {
+    Route::post('/device', [FirebaseDeviceController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('device.store');
+    Route::delete('/device', [FirebaseDeviceController::class, 'destroy'])
+        ->middleware('throttle:10,1')
+        ->name('device.destroy');
+});
+
+Route::middleware('auth')->prefix('notifications')->name('notifications.')->group(function () {
+    Route::get('/', [NotificationController::class, 'index'])->name('index');
+    Route::patch('/read-all', [NotificationController::class, 'markAllRead'])->name('read-all');
+    Route::patch('/{notification}/read', [NotificationController::class, 'markRead'])->name('read');
+});
 
 Route::get('/table/{token}', [CustomerTableOrderController::class, 'menu'])
     ->middleware('subscription')

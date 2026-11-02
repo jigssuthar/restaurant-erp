@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\Concerns\ScopesBranchData;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\InventoryItem;
+use App\Services\FirebasePush;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -59,6 +60,17 @@ class InventoryController extends Controller
             return $item;
         });
 
+        if ($item->isLowStock()) {
+            app(FirebasePush::class)->notifyBranch(
+                $item->branch_id,
+                ['admin', 'manager'],
+                'Low inventory',
+                "{$item->name} is at or below its reorder level.",
+                route('admin.inventory.index', ['branch_id' => $item->branch_id, 'low_stock' => 1]),
+                $request->user()->id,
+            );
+        }
+
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Inventory item created.', 'redirect' => route('admin.inventory.index')], 201);
         }
@@ -85,7 +97,19 @@ class InventoryController extends Controller
             'unit_cost' => ['required', 'numeric', 'min:0'],
             'is_active' => ['required', 'boolean'],
         ]);
+        $wasLowStock = $inventory->isLowStock();
         $inventory->update($data);
+
+        if (! $wasLowStock && $inventory->isLowStock()) {
+            app(FirebasePush::class)->notifyBranch(
+                $inventory->branch_id,
+                ['admin', 'manager'],
+                'Low inventory',
+                "{$inventory->name} has reached its reorder level.",
+                route('admin.inventory.index', ['branch_id' => $inventory->branch_id, 'low_stock' => 1]),
+                $request->user()->id,
+            );
+        }
 
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Inventory item updated.', 'redirect' => route('admin.inventory.index')]);
@@ -114,14 +138,17 @@ class InventoryController extends Controller
             'reason' => ['required', 'string', 'max:255'],
         ]);
 
-        DB::transaction(function () use ($inventory, $data, $request) {
+        $becameLowStock = false;
+        DB::transaction(function () use ($inventory, $data, $request, &$becameLowStock) {
             $locked = InventoryItem::whereKey($inventory->id)->lockForUpdate()->firstOrFail();
+            $wasLowStock = $locked->isLowStock();
             $delta = $data['movement_type'] === 'in' ? (float) $data['quantity'] : -((float) $data['quantity']);
             $after = (float) $locked->quantity_on_hand + $delta;
             if ($after < 0) {
                 throw ValidationException::withMessages(['quantity' => 'Stock cannot be reduced below zero.']);
             }
             $locked->update(['quantity_on_hand' => $after]);
+            $becameLowStock = ! $wasLowStock && $locked->isLowStock();
             $locked->movements()->create([
                 'created_by' => $request->user()->id,
                 'movement_type' => $data['movement_type'],
@@ -130,6 +157,17 @@ class InventoryController extends Controller
                 'reason' => $data['reason'],
             ]);
         });
+
+        if ($becameLowStock) {
+            app(FirebasePush::class)->notifyBranch(
+                $inventory->branch_id,
+                ['admin', 'manager'],
+                'Low inventory',
+                "{$inventory->name} has reached its reorder level.",
+                route('admin.inventory.index', ['branch_id' => $inventory->branch_id, 'low_stock' => 1]),
+                $request->user()->id,
+            );
+        }
 
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Stock adjusted.', 'quantity' => (float) $inventory->fresh()->quantity_on_hand]);

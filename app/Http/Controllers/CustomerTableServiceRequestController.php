@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DiningTable;
 use App\Models\TableServiceRequest;
+use App\Services\FirebasePush;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -43,6 +44,16 @@ class CustomerTableServiceRequestController extends Controller
                 'note' => $data['note'] ?? null,
             ]);
         });
+
+        if ($serviceRequest->wasRecentlyCreated) {
+            app(FirebasePush::class)->notifyBranch(
+                $serviceRequest->branch_id,
+                ['admin', 'manager', 'staff', 'waiter', 'captain'],
+                'New table service request',
+                'Table '.$serviceRequest->diningTable->table_number.': '.str_replace('_', ' ', $serviceRequest->request_type).'.',
+                route('service-app.index', ['branch_id' => $serviceRequest->branch_id]),
+            );
+        }
 
         if ($request->expectsJson()) {
             return response()->json([
